@@ -297,7 +297,7 @@ const SCRAPING_TARGETS = [
   {
     name: 'de_selmundo',
     customer: 'Selmundo',
-    pattern: 'https://www.selmundo.com/selmundo:*',
+    pattern: 'https://www.selmundo.com/:*',
     visitPriority: {
       only: [
         'https://www.selmundo.com/de/packband*',
