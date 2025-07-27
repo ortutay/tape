@@ -1,0 +1,30 @@
+- product name: this is the product title, e.g. Fita adesiva para demarcação 50 mm x 30 m 
+- brand: e.g. tesa or 3M
+- domain: format: https://domain.com/
+- Shop name: this can be taken directly out of our code in the field "Customer", e.g. Moosmann
+- country: format "Germany" -> derived from "name" field convention like pl_semicon for Poland
+- url: the url of the product page
+- SKU: nearly all tapes have a SKU/product number like tesa 60428 or 3M 471
+- EAN: this is a standard product number field used worldwide. most shops have this. some (especially in the U.S.) are using UPC instead of EAN, therefore we should put the UPC also in this field. ofc we should always have 1 number only, EAN prefered.
+- proxy option: auto, none, residential_cdp etc.
+- proxy: the used proxy, e.g. residential
+- transform options: reduce, slim, text only, full html etc.
+- extract mode: ai or code or whatever we have else as an option
+- category url: it would be great to have all category urls in the final excel, separated by new lines (the ones we have in the code for every shop)
+- description: text from a description field that describes the product
+- originalPrice: { value: 88.99, currency: 'BRL' },
+- convertedPrice: should be in EUR, e.g. 13,63€
+- sqm price = price per m² (sqm) -> calculated via a formula from length + width
+- length: value: 30, unit: 'm'
+- width: value: 50, unit: 'mm'
+- originalWeight: value: 0.388, unit: 'kg'
+- convertedWeight: value: 388, unit: 'g' (gram)
+- color: red
+- category: e.g. Masking tape
+- sub categories -> if possible get all sub categories in one field separated like this example: tapes/industrial-tapes/masking-tapes/red-tapes
+- material: could be anything, paper, pvc etc. its the material of the adhesive tape
+- thickness: e.g. 0,2 mm -> IMPORTANT: some use mm and some use mµ, needs to be converted to one
+- Type of adhesive: e.g. acrylic or rubber
+- Backing: the backing of the adhesive tape, e.g. acrylic foam
+- temperature: sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C.
+- date: when this shop/product has been crawled -> format: DD.MM.YYY

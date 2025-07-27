@@ -19,7 +19,10 @@ try {
 
 // Configure SDK with API key from environment
 const api_key = process.env.FETCHFOX_API_KEY;
-configure({ apiKey: api_key });
+configure({
+  apiKey: api_key,
+  host: 'https://dev.api.fetchfox.ai',
+});
 
 // PROXY OPTIONS - Mark with 'x' to select which proxy to use
 // auto: Let FetchFox choose the best proxy automatically
@@ -38,11 +41,13 @@ const PROXY_OPTIONS = {
 // TRANSFORM METHODS - For reducing AI context and cost
 // Mark with 'x' to select which transform method to use
 const TRANSFORM_OPTIONS = {
+  // Usually good
   'reduce': '',        // Reduces content intelligently (similar to SDK default)
+  'reduce,slim_html': 'x',      // Reduce + remove unnecessary HTML
+  'reduce,text_only': '',      // Reduce + text only
+
   'text_only': '',      // Extracts only text content
   'slim_html': '',      // Removes unnecessary HTML
-  'reduce,slim_html': '',      // Reduce + remove unnecessary HTML
-  'reduce,text_only': 'x',      // Reduce + text only
   'full_html': '',           // No transformation (full HTML)
 };
 
@@ -56,13 +61,42 @@ const EXTRACT_MODES = {
 // PROCESSING LIMITS - Following SDK approach
 const MAX_DEPTH = 3;           // Crawl depth limit (0 = current page only)
 const MAX_VISITS = 50;        // Maximum pages to visit during crawl
-const MAX_EXTRACTS = 100;      // Limit URLs for extraction (cost control)
+const MAX_EXTRACTS = 10;      // Limit URLs for extraction (cost control)
 
 // ============================================================================
 // SCRAPING TARGETS - Enhanced with pagination templates and customer info
 // ============================================================================
 
 const SCRAPING_TARGETS = [
+  {
+    name: 'de_hoffmann_verpackung',
+    customer: 'Carl Bernh. Hoffmann GmbH & Co. KG',
+    pattern: 'https://www.hoffmann-verpackung.de/*c=*',
+    startUrls: [
+      'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband/?p=1&o=2&n=100',
+	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/?p=1&o=2&n=100',
+	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/warndruck-klebeband/?p=1&o=2&n=48',
+	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/nassklebeband/?p=1&o=2&n=48',
+	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/kreppband/?p=1&o=2&n=48',
+	  ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+
+  {
+    name: 'de_hoffmann_group',
+    customer: 'Hoffmann Group',
+    pattern: 'https://www.hoffmann-group.com/DE/de/hom/p/*',
+    startUrls: [
+      'https://www.hoffmann-group.com/DE/de/hom/Chemisch-technische-Produkte/Klebeb%C3%A4nder/c/06-07-00-00-00',
+      'https://www.hoffmann-group.com/DE/de/hom/Chemisch-technische-Produkte/Klebeb%C3%A4nder/c/06-07-00-00-00?page={{1..100}}',
+	  ],
+    maxDepth: 0,
+    maxVisits: 4,
+    // proxy: 'datacenter',
+    proxy: 'residential_cdp',
+  },
+
   {
     name: 'de_sks',
     customer: 'SKS',
@@ -523,7 +557,7 @@ const SCRAPING_TARGETS = [
   {
     name: 'hr_tahea',
     customer: 'Tahea',
-    pattern: 'https://www.spooling.hr/*',
+    pattern: 'https://www.spooling.hr/product-page/*',
     startUrls: [
       // Main category
       'https://www.spooling.hr/proizvodi',
@@ -591,9 +625,45 @@ function getSelectedOption(options) {
 // ============================================================================
 
 async function run_case(targetData) {
-  const { name, customer, pattern, startUrls } = targetData;
+  const { name, customer, pattern, startUrls, ...rest } = targetData;
 
-  const template = 'Extract name, price, categories, and all technical details for the products. price should be a dictionary of amount and currency, amount is a decimal field with two decimals. Include fields for dimensions if available. Include a place for general technical details in case different products have more or fewer technical details. If there are variants on any aspect, for example variants in color, dimensions, or other attributes, include those in an array and specify what is varying.';
+  const old_template = 'Extract name, price, categories, and all technical details for the products. price should be a dictionary of amount and currency, amount is a decimal field with two decimals. Include fields for dimensions if available. Include a place for general technical details in case different products have more or fewer technical details. If there are variants on any aspect, for example variants in color, dimensions, or other attributes, include those in an array and specify what is varying.';
+
+  const template = {
+    name: 'Product name.',
+    brand: 'Brand of the product, eg. tesa, 3m, etc.',
+    shopName: 'Name of the shop, unique per domain',
+    sku: 'Product SKU',
+    ean: 'this is a standard product number field used worldwide. most shops have this. some (especially in the U.S.) are using UPC instead of EAN, therefore we should put the UPC also in this field. ofc we should always have 1 number only, EAN prefered.',
+    categoryUrl: 'Category page that contains this product',
+    categoryName: 'Name of the category for this product',
+    description: 'text from a description field that describes the product',
+
+    color: 'Color of the product',
+    material: 'could be anything, paper, pvc etc. its the material of the adhesive tape',
+    type: 'Type of adhesive: e.g. acrylic or rubber',
+    backing: 'the backing of the adhesive tape, e.g. acrylic foam',
+    temperature: 'sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
+
+    dimensions: {
+      originalWidth: 'Width of the variant, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple variants, pick the first one or main one. All dimensions must be for the same variant',
+      width: 'Width of the variant, if available, in mm. Include "value" and "unit" fields.',
+      originalLength: 'Length of the variant, in the unit listed on the site. Include "value" and "unit" fields.',
+      length: 'Length of the variant, in m. Include "value" and "unit" fields.',
+      originalWeight: 'Width of the variant, in the unit listed on the site. Include "value" and "unit" fields.',
+      weight: 'Width of the variant, in g. Include "value" and "unit" fields.',
+      originalThickness: 'Thickness  the variant, in the unit listed on the site. Include "value" and "unit" fields.',
+      thickness: 'Thickness of the variant, in mm. Include "value" and "unit" fields.',
+    },
+
+    rawProductPrice: 'The price of the product. Do not give a per unit price, but give the raw price for the listed product in its entireity, with no numerical transformations. The price should be the price that applies to the 1 purchase of the product in the dimensions you found above. Give two fields: "value", which is a decimal number in format X.XX, and "currency", which is a three letter currency code',
+    euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with two fields: "value" which is a decimal number X.XX, and "currency" which is EUR. Use these conversions:
+Country,Currency Code,1 EUR Equals,Source,Date
+United Kingdom,GBP,0.8665,European Central Bank,2025-07-23
+Switzerland,CHF,0.9306,European Central Bank,2025-07-23
+Sweden,SEK,11.164,European Central Bank,2025-07-23
+Poland,PLN,4.2553,European Central Bank,2025-07-24`,
+  };
 
   console.log(`\n=== Processing ${name} (${customer}) ===`);
 
@@ -603,6 +673,7 @@ async function run_case(targetData) {
   const selectedExtractMode = getSelectedOption(EXTRACT_MODES);
 
   // SDK Configuration object (SDK handles pagination templates natively)
+  console.log('Rest:', rest);
   const crawlConfig = {
     pattern,
     startUrls: startUrls,
@@ -610,7 +681,9 @@ async function run_case(targetData) {
     maxDepth: MAX_DEPTH,
     proxy: selectedProxy,
     crawlPriority: 'random',
+    ...rest,
   };
+  console.log('crawlConfig', crawlConfig);
 
   // Add transform if not 'none'
   if (selectedTransform !== 'none') {
@@ -619,7 +692,7 @@ async function run_case(targetData) {
 
   try {
     // Step 1: Crawl to get URLs using SDK
-    console.log(`Run crawl with proxy: ${selectedProxy}, transform: ${selectedTransform}`);
+    console.log(`Run crawl with proxy: ${crawlConfig.proxy}, transform: ${selectedTransform}`);
     const crawlResult = await crawl(crawlConfig);
     const urls = (crawlResult.results && crawlResult.results.hits) || [];
     
@@ -634,6 +707,7 @@ async function run_case(targetData) {
       template,
       proxy: selectedProxy,
       extractMode: selectedExtractMode,
+      ...rest,
     };
 
     // Add transform if not 'none'
