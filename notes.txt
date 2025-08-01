@@ -1,6 +1,9 @@
 OK:
 - de_hoffmann_verpackung
 - de_hoffmann_group
+- cn_ehsy
+- us_rs_hughes
+- us_uline
 
 Issues:
 - de_haberkorn: must be logged in to see price
@@ -8,3 +11,4 @@ Issues:
 - us_fastenal: issues parsing page, execess reduces, maybe related to perPage = many
 - us_kramp: must be logged in to see price
 - de_tme: prompt / data loading for price
+- us_addev: must be logged in to see price, quote based system

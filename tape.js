@@ -14,6 +14,14 @@ try {
   // dotenv not installed, continue with process.env only
 }
 
+const workingShops = [
+  'de_hoffmann_verpackung',
+  'de_hoffmann_group',
+  'cn_ehsy',
+  'us_rs_hughes',
+  'us_uline',
+]
+
 // ============================================================================
 // FETCHFOX CONFIGURATION OPTIONS - Edit these to change behavior
 // ============================================================================
@@ -26,7 +34,7 @@ configure({
 });
 
 // Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
-const USE_SAVED_URLS = true;
+const USE_SAVED_URLS = false;
 
 // PROXY OPTIONS - Mark with 'x' to select which proxy to use
 // auto: Let FetchFox choose the best proxy automatically
@@ -65,7 +73,7 @@ const EXTRACT_MODES = {
 // PROCESSING LIMITS - Following SDK approach
 const MAX_DEPTH = 3;           // Crawl depth limit (0 = current page only)
 const MAX_VISITS = 50;        // Maximum pages to visit during crawl
-const MAX_EXTRACTS = 10;      // Limit URLs for extraction (cost control)
+const MAX_EXTRACTS = 20;      // Limit URLs for extraction (cost control)
 
 // ============================================================================
 // SCRAPING TARGETS - Enhanced with pagination templates and customer info
@@ -183,6 +191,69 @@ const SCRAPING_TARGETS = [
     maxDepth: 0,
     maxVisits: 10,
     loadWait: 6000,
+  },
+
+  {
+    name: 'cn_ehsy',
+    customer: 'Ehsy',
+    pattern: 'https://www.ehsy.com/product-*',
+    startUrls: [
+      'https://www.ehsy.com/category-16688?p={{1..100}}',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+
+  {
+    name: 'us_rs_hughes',
+    customer: 'R.S. Hughes',
+    pattern: 'https://www.rshughes.com/p/*',
+    startUrls: [
+      'https://www.rshughes.com/c/Tapes/3002/',
+    ],
+    priority: {
+      only: [
+        'https://www.rshughes.com/c/*',
+      ],
+      high: [
+        // Tape categories
+        'https://www.rshughes.com/c/*Tape*',
+        // Category pages
+        'https://www.rshughes.com/c/*Tape*start_item=*',
+      ],
+    },
+    contentTransform: 'text_only',
+    maxDepth: 1,
+    maxVisits: 50,
+    crawlStrategy: 'dfs',
+  },
+
+  {
+    name: 'us_uline',
+    customer: 'ULINE',
+    pattern: 'https://www.uline.com/Product/Detail/*Tape*',
+    startUrls: [
+      'https://www.uline.com/Cls_02/Tape',
+    ],
+    priority: {
+      only: [
+        'https://www.uline.com/BL*Tape*',
+        'https://www.uline.com/Grp*Tape*',
+      ],
+      skip: [
+        '*Dispenser*',
+        'https://www.uline.com/Grp_16/Hand-Held-Tape-Dispensers',
+        'https://www.uline.com/Grp_128/Kraft-Tape-Dispensers',
+        'https://www.uline.com/Grp_288/Velcro-Brand',
+        'https://www.uline.com/Grp_526/Hook-and-Loop-Tape',
+        'https://www.uline.com/Grp_247/Glue-Dots',
+        'https://www.uline.com/Grp_339/Adhesives-Glue-Epoxy',
+        'https://www.uline.com/Grp_85/Glue-Guns-and-Glue-Sticks',
+      ],
+    },
+    maxDepth: 2,
+    maxVisits: 100,
+    crawlStrategy: 'dfs',
   },
 
   {
@@ -716,7 +787,7 @@ async function run_case(targetData) {
   const { name, customer, pattern, startUrls, ...rest } = targetData;
 
   const template = {
-    name: 'Product name.',
+    name: 'Product name. For this and all other fields, give answers in ENGLISH',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
     shopName: 'Name of the shop, unique per domain',
     sku: 'Product SKU',
@@ -742,13 +813,24 @@ async function run_case(targetData) {
       thickness: 'Thickness of the variant, in mm. Include "value" and "unit" fields.',
     },
 
-    rawProductPrice: 'The price of the product. Give raw price from the site, do not transform it in anyway. Give four fields: "value", which is a decimal number in format X.XX, and "currency", which is a three letter currency code, "unit", which is the unit being sold, eg. "m", "mm", and "amount", which is the amount of that unit',
-    euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversionsb:g
+    rawProductPrice: `The price of the product. Give raw price from the site, do not transform it in anyway. Give four fields:
+
+- "value", which is a decimal number in format X.XX
+- "currency", which is a three letter currency code
+- "unit", which is the unit being sold. Give one of "m" or "mm" if it is a measurement, or just "unit" if it is sold as a single unit in the dimensions desecribed above. Always english, always give one of these units.
+- "amount", which is the amount of that unit
+
+`,
+    euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversions:
+
 Country,Currency Code,1 EUR Equals,Source,Date
-United Kingdom,GBP,0.8665,European Central Bank,2025-07-23
-Switzerland,CHF,0.9306,European Central Bank,2025-07-23
-Sweden,SEK,11.164,European Central Bank,2025-07-23
-Poland,PLN,4.2553,European Central Bank,2025-07-24`,
+United Kingdom,GBP,0.8649,European Central Bank,2025-07-31
+Switzerland,CHF,0.9297,European Central Bank,2025-07-31
+Sweden,SEK,11.1575,European Central Bank,2025-07-31
+Poland,PLN,4.2728,European Central Bank,2025-07-31
+China,CNY,8.2350,European Central Bank,2025-07-31
+`
+    
   };
 
   console.log(`\n=== Processing ${name} (${customer}) ===`);
@@ -772,7 +854,7 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
   console.log('crawlConfig', crawlConfig);
 
   // Add transform if not 'none'
-  if (selectedTransform !== 'none') {
+  if (!crawlConfig.contentTransform && selectedTransform !== 'none') {
     crawlConfig.contentTransform = [selectedTransform];
   }
 
@@ -810,7 +892,7 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
     };
 
     // Add transform if not 'none'
-    if (selectedTransform !== 'none') {
+    if (!extractConfig.contentTransform && selectedTransform !== 'none') {
       extractConfig.contentTransform = selectedTransform;
     }
 
@@ -864,7 +946,7 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
     console.log(`Cost per 1k items: $${costPer1k.toFixed(2)}`);
     console.log(`Output saved to: ${outputPath}`);
 
-    return result;
+    return { result, name, outputPath };
 
   } catch (error) {
     console.error(`Error processing ${name}:`, error.message);
@@ -948,15 +1030,49 @@ export { run, scrapeTarget, run_case, SCRAPING_TARGETS };
 if (import.meta.url === `file://${process.argv[1]}`) {
   const targetName = process.argv[2];
   
-  if (targetName) {
+  if (targetName == 'working') {
+    const jobs = workingShops.map(it => scrapeTarget(it));
+
+    const results = await Promise.all(jobs);
+
+    console.log('results', results);
+
+    console.log(`Finished scraping all working shops ${workingShops.join(',')}`);
+    for (const { outputPath, name, result } of results) {
+      console.log(`- ${name}\t${outputPath}`);
+
+      for (const item of result.items.slice(0, 10)) {
+        const euros = item.euroProductPrice?.value;
+        const width = item.dimensions?.width?.value;
+        let length;
+        if (item.euroProductPrice?.unit == 'unit') {
+          length = item.dimensions?.length?.value;
+        } else {
+          length = item.euroProductPrice?.amount;
+        }
+        let sqm;
+        try {
+          sqm = (length * width / 1000) / euros;
+          sqm = (sqm / 1.0).toFixed(4);
+        } catch (e) {
+          sqm = 'n/a';
+        }
+        if (isNaN(sqm)) {
+          sqm = 'n/a';
+        }
+
+        console.log(`\t${sqm} EUR / mm²`.padEnd(20) + item._url);
+      }
+    }
+
+  } else if (targetName) {
     console.log(`Scraping target: ${targetName}`);
-    scrapeTarget(targetName)
-      .then(() => process.exit(0))
-      .catch(console.error);
+    await scrapeTarget(targetName);
+
   } else {
     console.log('Scraping all targets...');
-    run()
-      .then(() => process.exit(0))
-      .catch(console.error);
+    await run()
   }
+
+  process.exit(0);
 } 
