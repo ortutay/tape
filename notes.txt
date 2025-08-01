@@ -1,21 +1,10 @@
-> 1) I have included an info field for every customer/page. Whenever this is filled, there is a todo.
-OK
+OK:
+- de_hoffmann_verpackung
+- de_hoffmann_group
 
-> 2) I struggle with some pages that basically have no real sub categories, but a lot main categories. How to set this up correct?
-The key is to have starting URLs that link to the pages with the data. So it doesn't really matter if they are sub categories, main categories, etc. As long as there is a link to the product page, that is OK
-
-> 3) With pages where I have 20 sub categories, I dont think I need to name any of them if they are already ALL in the depth of the main category, correct?
-You can do this:
-
-  pattern: 'https://example.com/de/product/*',
-  startUrls: ['https://example.com/de/category-1'],
-  maxDepth: 1,
-
-Then if 'https://example.com/de/category-1' links to 'https://example.com/de/category-1'/sub-category-xyz', which then links to 'https://example.com/de/product/tape-abc', the crawler will find it.
-
-> 4) Some websites have "annoying prices" like this: https://www.shop-sks.com/tesafix-4957-19mmx25m-weiss -> the AI may think the tape is 146,72€ but its not. its actually 9,17€ (Einzelpreis = single price). Some prices have these bundles or MOQ. Any way to get rid of that and train the AI to learn it? Because for us always the single price is important and ofc price per sqm which we will convert.
-I've updated the template to name it "rawProductPrice", and added some prompt clarification
-Question, for this one https://www.hoffmann-group.com/DE/de/hom/p/7000001172- is the price 72.40 EUR (VAT), or 60.84 EUR (no VAT)?
-
-> 5) This would be the (hopefully final) list of the mappings, what we would need. This is really the best case. I have also included the new shops here: https://www.filemail.com/d/dskotrrksmglqkk
-Updated the template to include these, you can see it here: 
+Issues:
+- de_haberkorn: must be logged in to see price
+- no_norengros: must be logged in to see price
+- us_fastenal: issues parsing page, execess reduces, maybe related to perPage = many
+- us_kramp: must be logged in to see price
+- de_tme: prompt / data loading for price

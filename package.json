@@ -10,6 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "fetchfox-sdk": "^1.0.2"
+    "fetchfox-sdk": "^1.0.7"
   }
 }

@@ -1,4 +1,5 @@
 import { configure, crawl, extract } from 'fetchfox-sdk';
+import * as fox from 'fetchfox-sdk';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -23,6 +24,9 @@ configure({
   apiKey: api_key,
   host: 'https://dev.api.fetchfox.ai',
 });
+
+// Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
+const USE_SAVED_URLS = true;
 
 // PROXY OPTIONS - Mark with 'x' to select which proxy to use
 // auto: Let FetchFox choose the best proxy automatically
@@ -93,8 +97,92 @@ const SCRAPING_TARGETS = [
 	  ],
     maxDepth: 0,
     maxVisits: 4,
-    // proxy: 'datacenter',
-    proxy: 'residential_cdp',
+    proxy: 'datacenter',
+  },
+
+  {
+    name: 'de_haberkorn',
+    customer: 'Haberkorn',
+    pattern: 'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/*l=3',
+    startUrls: [
+      'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/klebebaender-einseitig?page={{1..20}}',
+      'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/klebebaender-doppelseitig?page={{1..20}}',
+      'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/reflektierende-folien?page={{1..20}}',
+	  ],
+    maxDepth: 0,
+    maxVisits: 10,
+    proxy: 'datacenter',
+  },
+
+  {
+    name: 'no_norengros',
+    customer: 'Norengros',
+    pattern: 'https://www.norengros.no/product/*',
+    startUrls: [
+      'https://www.norengros.no/category/emballasje/tape?page={{0..20}}',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+
+  {
+    name: 'us_fastenal',
+    customer: 'Fastenal',
+    pattern: 'https://www.fastenal.com/product/Adhesives*?productFamilyId=*',
+    startUrls: [
+      'https://www.fastenal.com/product/Adhesives%2C%20Sealants%2C%20and%20Tape/Tape?categoryId=601991',
+    ],
+    priority: {
+      only: [
+        'https://www.fastenal.com/product/Adhesives%2C%20Sealants%2C%20and%20Tape/Tape/*',
+      ],
+    },
+    crawlStrategy: 'dfs',
+    maxDepth: 3,
+    maxVisits: 100,
+    perPage: 'many',
+  },
+
+  {
+    name: 'us_kramp',
+    customer: 'Kramp',
+    pattern: 'https://www.kramp.com/shop-gb/en/vp/*',
+    startUrls: [
+      'https://www.kramp.com/shop-gb/en/c/adhesive-tape--web3-4055687?page={{1..20}}',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+
+  {
+    name: 'de_eriks',
+    customer: 'Eriks',
+    pattern: 'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender-abdeck-klebebaender/*',
+    startUrls: [
+      'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender/',
+    ],
+    priority: {
+      only: [
+        'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender*',
+      ],
+    },
+    maxDepth: 3,
+    maxVisits: 100,
+    crawlStrategy: 'dfs',
+    perPage: 'many',
+  },
+
+  {
+    name: 'de_tme',
+    customer: 'Transfer Multisort Elektronik',
+    pattern: 'https://www.tme.eu/de/details/*',
+    startUrls: [
+      'https://www.tme.eu/de/katalog/warn-und-markierungsbander_113787/?page={{1..20}}',
+	    'https://www.tme.eu/de/katalog/bander_112715/?page={{1..20}}',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+    loadWait: 6000,
   },
 
   {
@@ -627,8 +715,6 @@ function getSelectedOption(options) {
 async function run_case(targetData) {
   const { name, customer, pattern, startUrls, ...rest } = targetData;
 
-  const old_template = 'Extract name, price, categories, and all technical details for the products. price should be a dictionary of amount and currency, amount is a decimal field with two decimals. Include fields for dimensions if available. Include a place for general technical details in case different products have more or fewer technical details. If there are variants on any aspect, for example variants in color, dimensions, or other attributes, include those in an array and specify what is varying.';
-
   const template = {
     name: 'Product name.',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
@@ -656,8 +742,8 @@ async function run_case(targetData) {
       thickness: 'Thickness of the variant, in mm. Include "value" and "unit" fields.',
     },
 
-    rawProductPrice: 'The price of the product. Do not give a per unit price, but give the raw price for the listed product in its entireity, with no numerical transformations. The price should be the price that applies to the 1 purchase of the product in the dimensions you found above. Give two fields: "value", which is a decimal number in format X.XX, and "currency", which is a three letter currency code',
-    euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with two fields: "value" which is a decimal number X.XX, and "currency" which is EUR. Use these conversions:
+    rawProductPrice: 'The price of the product. Give raw price from the site, do not transform it in anyway. Give four fields: "value", which is a decimal number in format X.XX, and "currency", which is a three letter currency code, "unit", which is the unit being sold, eg. "m", "mm", and "amount", which is the amount of that unit',
+    euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversionsb:g
 Country,Currency Code,1 EUR Equals,Source,Date
 United Kingdom,GBP,0.8665,European Central Bank,2025-07-23
 Switzerland,CHF,0.9306,European Central Bank,2025-07-23
@@ -692,9 +778,22 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
 
   try {
     // Step 1: Crawl to get URLs using SDK
-    console.log(`Run crawl with proxy: ${crawlConfig.proxy}, transform: ${selectedTransform}`);
-    const crawlResult = await crawl(crawlConfig);
-    const urls = (crawlResult.results && crawlResult.results.hits) || [];
+
+    let urls;
+    let crawlResult;
+
+    // Try to get URLs from the API
+    const data = USE_SAVED_URLS ? await fox.urls.list({ pattern: crawlConfig.pattern }) : {};
+    if (USE_SAVED_URLS && data?.results?.length > 2) {
+      console.log('Not running crawl, using saved URLs');
+      urls = data.results;
+    } else {
+      console.log(`Run crawl with proxy: ${crawlConfig.proxy}, transform: ${selectedTransform}`);
+      const crawlJob = await crawl.detach(crawlConfig);
+      console.log('Crawl progress:', crawlJob.appUrl);
+      crawlResult = await crawlJob.finished();
+      urls = (crawlResult.results && crawlResult.results.hits) || [];
+    }
     
     console.log('Found URLs:', urls.length);
     console.log('First few URLs:', urls.slice(0, 10));
@@ -716,7 +815,9 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
     }
 
     console.log(`Run extract with ${limitedUrls.length} URLs, mode: ${selectedExtractMode}`);
-    const extractResult = await extract(extractConfig);
+    const extractJob = await extract.detach(extractConfig);
+    console.log('Extract progress:', extractJob.appUrl);
+    const extractResult = await extractJob.finished();
     const items = (extractResult.results && extractResult.results.items) || [];
 
     console.log('Items extracted:', items.length);
@@ -725,7 +826,7 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
     console.log(items.slice(0, 3));
 
     // Step 3: Calculate costs and metrics (in-memory analysis)
-    const crawlCost = crawlResult.metrics?.cost?.total || 0;
+    const crawlCost = crawlResult?.metrics?.cost?.total || 0;
     const extractCost = extractResult.metrics?.cost?.total || 0;
     const totalCost = crawlCost + extractCost;
     const costPer1k = items.length > 0 ? (totalCost / items.length) * 1000 : 0;
@@ -737,7 +838,7 @@ Poland,PLN,4.2553,European Central Bank,2025-07-24`,
       items: items,
       cost: totalCost,
       costPer1k: costPer1k,
-      crawlMetrics: crawlResult.metrics,
+      crawlMetrics: crawlResult?.metrics || {},
       extractMetrics: extractResult.metrics,
     };
 
@@ -849,9 +950,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   
   if (targetName) {
     console.log(`Scraping target: ${targetName}`);
-    scrapeTarget(targetName).catch(console.error);
+    scrapeTarget(targetName)
+      .then(() => process.exit(0))
+      .catch(console.error);
   } else {
     console.log('Scraping all targets...');
-    run().catch(console.error);
+    run()
+      .then(() => process.exit(0))
+      .catch(console.error);
   }
 } 
