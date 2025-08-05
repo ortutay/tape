@@ -34,7 +34,7 @@ configure({
 });
 
 // Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
-const USE_SAVED_URLS = false;
+const USE_SAVED_URLS = true;
 
 // PROXY OPTIONS - Mark with 'x' to select which proxy to use
 // auto: Let FetchFox choose the best proxy automatically
@@ -46,7 +46,7 @@ const PROXY_OPTIONS = {
   'auto': '',                    // Let FetchFox choose automatically
   'none': 'x',              // Cheapest option, may be blocked
   'datacenter': '',              // Cheapest option, may be blocked
-  'residential_cdp': '',        // Residential IPs
+  'residential_cdp': '',        // R3esidential IPs
   'residential_cdp_assets': '',  // Most expensive, loads assets
 };
 
@@ -897,9 +897,10 @@ China,CNY,8.2350,European Central Bank,2025-07-31
     }
 
     console.log(`Run extract with ${limitedUrls.length} URLs, mode: ${selectedExtractMode}`);
-    const extractJob = await extract.detach(extractConfig);
-    console.log('Extract progress:', extractJob.appUrl);
-    const extractResult = await extractJob.finished();
+    // const extractJob = await extract.detach(extractConfig);
+    // console.log('Extract progress:', extractJob.appUrl);
+    // const extractResult = await extractJob.finished();
+    const extractResult = await extract(extractConfig);
     const items = (extractResult.results && extractResult.results.items) || [];
 
     console.log('Items extracted:', items.length);
@@ -931,12 +932,8 @@ China,CNY,8.2350,European Central Bank,2025-07-31
     }
 
     const outputPath = path.join(resultsDir, `results_${name}.jsonl`);
-    const fileHandle = fs.createWriteStream(outputPath, { flags: 'w' });
-
-    for (const item of items) {
-      fileHandle.write(JSON.stringify(item) + '\n');
-    }
-    fileHandle.end();
+    const str = items.map(it => JSON.stringify(it)).join('\n');
+    fs.writeFileSync(outputPath, str, 'utf-8');
 
     console.log(`\n=== Results for ${name} ===`);
     console.log(`Customer: ${customer}`);
