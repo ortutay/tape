@@ -808,11 +808,11 @@ async function run_case(targetData) {
 
     dimensions: {
       originalWidth: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product',
-      width: 'Width of the product, if available, in mm. Typicalls listed in format (width)mm x (length)m Include "value" and "unit" fields.',
+      width: 'Width of the product, if available, in mm (millimeters). Typically listed in format (width) x (length) Include "value" and "unit" fields.',
       originalLength: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields.',
-      length: 'Length of the product, in m. Include "value" and "unit" fields.',
+      length: 'Length of the product, in m (meters). Include "value" and "unit" fields.',
       originalWeight: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields.',
-      weight: 'Width of the product, in g. Include "value" and "unit" fields.',
+      weight: 'Width of the product, in g (grams). Include "value" and "unit" fields.',
       originalThickness: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields.',
       thickness: 'Thickness of the product, in mm. Include "value" and "unit" fields.',
     },
@@ -873,7 +873,7 @@ China,CNY,8.2350,European Central Bank,2025-07-31
 
     if (false) {
       urls = [
-        'https://www.uline.com/Product/Detail/S-10173/3M-Carton-Sealing-Tape/3M-142-Shipping-Tape-with-Dispenser-Clear-2-x-222-yds',
+        'https://www.uline.com/Product/Detail/S-10154/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-3-x-1000-yds-Clear',
       ];
     } else if (USE_SAVED_URLS && data?.results?.length > 2) {
       console.log('Not running crawl, using saved URLs');
