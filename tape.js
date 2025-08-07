@@ -17,7 +17,7 @@ try {
 const workingShops = [
   'de_hoffmann_verpackung',
   'de_hoffmann_group',
-  'cn_ehsy',
+  // 'cn_ehsy',
   'us_rs_hughes',
   'us_uline',
 ]
@@ -34,7 +34,7 @@ configure({
 });
 
 // Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
-const USE_SAVED_URLS = true;
+const USE_SAVED_URLS = false;
 
 // PROXY OPTIONS - Mark with 'x' to select which proxy to use
 // auto: Let FetchFox choose the best proxy automatically
@@ -54,8 +54,8 @@ const PROXY_OPTIONS = {
 // Mark with 'x' to select which transform method to use
 const TRANSFORM_OPTIONS = {
   // Usually good
-  'reduce': '',        // Reduces content intelligently (similar to SDK default)
-  'reduce,slim_html': 'x',      // Reduce + remove unnecessary HTML
+  'reduce,full_html': 'x',        // Reduces content intelligently (similar to SDK default)
+  'reduce,slim_html': '',      // Reduce + remove unnecessary HTML
   'reduce,text_only': '',      // Reduce + text only
 
   'text_only': '',      // Extracts only text content
@@ -72,8 +72,8 @@ const EXTRACT_MODES = {
 
 // PROCESSING LIMITS - Following SDK approach
 const MAX_DEPTH = 3;           // Crawl depth limit (0 = current page only)
-const MAX_VISITS = 50;        // Maximum pages to visit during crawl
-const MAX_EXTRACTS = 20;      // Limit URLs for extraction (cost control)
+const MAX_VISITS = 20;        // Maximum pages to visit during crawl
+const MAX_EXTRACTS = 100;      // Limit URLs for extraction (cost control)
 
 // ============================================================================
 // SCRAPING TARGETS - Enhanced with pagination templates and customer info
@@ -787,38 +787,42 @@ async function run_case(targetData) {
   const { name, customer, pattern, startUrls, ...rest } = targetData;
 
   const template = {
-    name: 'Product name. For this and all other fields, give answers in ENGLISH',
+    isTapeProduct: 'true or false, is this current page a tape product, as in a roll of tape. (not a category page, not a tape accessory, or other non-tape product)',
+    name: 'Product name. For this and all other fields, give answers in ENGLISH, translate if necessary',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
+    domain: 'The domain (host) of this website, based on the URL',
+    country: 'The two letter country code of this website, based on the URL, lower case',
     shopName: 'Name of the shop, unique per domain',
     sku: 'Product SKU',
     ean: 'this is a standard product number field used worldwide. most shops have this. some (especially in the U.S.) are using UPC instead of EAN, therefore we should put the UPC also in this field. ofc we should always have 1 number only, EAN prefered.',
     categoryUrl: 'Category page that contains this product',
-    categoryName: 'Name of the category for this product',
-    description: 'text from a description field that describes the product',
+    categoryEnglishName: 'Name of the category for this product, in English, translate if necessary',
+    subCategoryEnglishNames: 'Name of ALL categorty bread crumbs for this product, as an array. In English, translate if necessary,',
+    description: 'text from a description field that describes the product, in English, translate if necessary',
 
-    color: 'Color of the product',
-    material: 'could be anything, paper, pvc etc. its the material of the adhesive tape',
-    type: 'Type of adhesive: e.g. acrylic or rubber',
-    backing: 'the backing of the adhesive tape, e.g. acrylic foam',
+    color: 'Color of the product, in English, translate if necessary',
+    material: 'could be anything, paper, pvc etc. its the material of the adhesive tape, in English, translate if necessary',
+    type: 'Type of adhesive: e.g. acrylic or rubber, in English, translate if necessary',
+    backing: 'the backing of the adhesive tape, e.g. acrylic foam, in English, translate if necessary',
     temperature: 'sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
 
     dimensions: {
-      originalWidth: 'Width of the variant, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple variants, pick the first one or main one. All dimensions must be for the same variant',
-      width: 'Width of the variant, if available, in mm. Include "value" and "unit" fields.',
-      originalLength: 'Length of the variant, in the unit listed on the site. Include "value" and "unit" fields.',
-      length: 'Length of the variant, in m. Include "value" and "unit" fields.',
-      originalWeight: 'Width of the variant, in the unit listed on the site. Include "value" and "unit" fields.',
-      weight: 'Width of the variant, in g. Include "value" and "unit" fields.',
-      originalThickness: 'Thickness  the variant, in the unit listed on the site. Include "value" and "unit" fields.',
-      thickness: 'Thickness of the variant, in mm. Include "value" and "unit" fields.',
+      originalWidth: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product',
+      width: 'Width of the product, if available, in mm. Typicalls listed in format (width)mm x (length)m Include "value" and "unit" fields.',
+      originalLength: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields.',
+      length: 'Length of the product, in m. Include "value" and "unit" fields.',
+      originalWeight: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields.',
+      weight: 'Width of the product, in g. Include "value" and "unit" fields.',
+      originalThickness: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields.',
+      thickness: 'Thickness of the product, in mm. Include "value" and "unit" fields.',
     },
 
-    rawProductPrice: `The price of the product. Give raw price from the site, do not transform it in anyway. Give four fields:
+    rawWithVatProductPrice: `The full raw price of the product. Give full raw price from the site, including shipping and VAT. If multiple prices are listed, give the lowest per unit price. Do not transform it in anyway. Give four fields:
 
 - "value", which is a decimal number in format X.XX
 - "currency", which is a three letter currency code
 - "unit", which is the unit being sold. Give one of "m" or "mm" if it is a measurement, or just "unit" if it is sold as a single unit in the dimensions desecribed above. Always english, always give one of these units.
-- "amount", which is the amount of that unit
+- "amount", which is the amount of that unit. if "unit" is "m" or "mm", then give how many of that you are getting. If unit is "unit", then how many tape products are we getting?
 
 `,
     euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversions:
@@ -866,7 +870,12 @@ China,CNY,8.2350,European Central Bank,2025-07-31
 
     // Try to get URLs from the API
     const data = USE_SAVED_URLS ? await fox.urls.list({ pattern: crawlConfig.pattern }) : {};
-    if (USE_SAVED_URLS && data?.results?.length > 2) {
+
+    if (false) {
+      urls = [
+        'https://www.uline.com/Product/Detail/S-10173/3M-Carton-Sealing-Tape/3M-142-Shipping-Tape-with-Dispenser-Clear-2-x-222-yds',
+      ];
+    } else if (USE_SAVED_URLS && data?.results?.length > 2) {
       console.log('Not running crawl, using saved URLs');
       urls = data.results;
     } else {
@@ -905,8 +914,34 @@ China,CNY,8.2350,European Central Bank,2025-07-31
 
     console.log('Items extracted:', items.length);
 
+    for (const item of items) {
+      const euros = item.euroProductPrice?.value;
+      const width = item.dimensions?.width?.value / 1000;
+      let length;
+      if (item.euroProductPrice?.unit == 'unit') {
+        length = item.euroProductPrice?.amount * item.dimensions?.length?.value;
+      } else {
+        length = item.euroProductPrice?.amount;
+      }
+      let eurPerSqm;
+      try {
+        // eurPerSqm = (length * width / 1000) / euros;
+        // eurPerSqm = (length * width / 1000) / euros;
+        // eurPerSqm = (eurPerSqm / 1.0).toFixed(4);
+        eurPerSqm =  euros / (length * width);
+      } catch (e) {
+        eurPerSqm = 'n/a';
+      }
+      if (isNaN(eurPerSqm)) {
+        eurPerSqm = 'n/a';
+      }
+
+      item.eurPerSqm = eurPerSqm;
+    }
+    
+
     console.log('First few items:');
-    console.log(items.slice(0, 3));
+    items.slice(0, 3).forEach(it => console.log(JSON.stringify(it, null, 2)));
 
     // Step 3: Calculate costs and metrics (in-memory analysis)
     const crawlCost = crawlResult?.metrics?.cost?.total || 0;
@@ -1039,26 +1074,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       console.log(`- ${name}\t${outputPath}`);
 
       for (const item of result.items.slice(0, 10)) {
-        const euros = item.euroProductPrice?.value;
-        const width = item.dimensions?.width?.value;
-        let length;
-        if (item.euroProductPrice?.unit == 'unit') {
-          length = item.dimensions?.length?.value;
-        } else {
-          length = item.euroProductPrice?.amount;
-        }
-        let sqm;
-        try {
-          sqm = (length * width / 1000) / euros;
-          sqm = (sqm / 1.0).toFixed(4);
-        } catch (e) {
-          sqm = 'n/a';
-        }
-        if (isNaN(sqm)) {
-          sqm = 'n/a';
-        }
-
-        console.log(`\t${sqm} EUR / mm²`.padEnd(20) + item._url);
+        console.log(`\t${item.eurPerSqm} EUR / mm²`.padEnd(20) + item._url);
       }
     }
 
