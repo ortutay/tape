@@ -54,9 +54,7 @@ const PROXY_OPTIONS = {
 // Mark with 'x' to select which transform method to use
 const TRANSFORM_OPTIONS = {
   // Usually good
-  'reduce,full_html': 'x',        // Reduces content intelligently (similar to SDK default)
-  'reduce,slim_html': '',      // Reduce + remove unnecessary HTML
-  'reduce,text_only': '',      // Reduce + text only
+  'reduce': 'x',        // Reduces content intelligently (similar to SDK default)
 
   'text_only': '',      // Extracts only text content
   'slim_html': '',      // Removes unnecessary HTML
@@ -83,7 +81,7 @@ const SCRAPING_TARGETS = [
   {
     name: 'de_hoffmann_verpackung',
     customer: 'Carl Bernh. Hoffmann GmbH & Co. KG',
-    pattern: 'https://www.hoffmann-verpackung.de/*c=*',
+    pattern: 'https://www.hoffmann-verpackung.de/**c=**',
     startUrls: [
       'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband/?p=1&o=2&n=100',
 	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/?p=1&o=2&n=100',
@@ -207,19 +205,19 @@ const SCRAPING_TARGETS = [
   {
     name: 'us_rs_hughes',
     customer: 'R.S. Hughes',
-    pattern: 'https://www.rshughes.com/p/*',
+    pattern: 'https://www.rshughes.com/p/**',
     startUrls: [
       'https://www.rshughes.com/c/Tapes/3002/',
     ],
     priority: {
       only: [
-        'https://www.rshughes.com/c/*',
+        'https://www.rshughes.com/c/**',
       ],
       high: [
         // Tape categories
-        'https://www.rshughes.com/c/*Tape*',
+        'https://www.rshughes.com/c/**Tape**',
         // Category pages
-        'https://www.rshughes.com/c/*Tape*start_item=*',
+        'https://www.rshughes.com/c/**Tape**start_item=*',
       ],
     },
     contentTransform: 'text_only',
@@ -231,17 +229,17 @@ const SCRAPING_TARGETS = [
   {
     name: 'us_uline',
     customer: 'ULINE',
-    pattern: 'https://www.uline.com/Product/Detail/*Tape*',
+    pattern: 'https://www.uline.com/Product/Detail/**',
     startUrls: [
-      'https://www.uline.com/Cls_02/Tape',
+      'https://www.uline.com/Cls_02/Tapef',
     ],
     priority: {
       only: [
-        'https://www.uline.com/BL*Tape*',
-        'https://www.uline.com/Grp*Tape*',
+        'https://www.uline.com/BL**Tape**',
+        'https://www.uline.com/Grp**Tape**',
       ],
       skip: [
-        '*Dispenser*',
+        '**Dispenser**',
         'https://www.uline.com/Grp_16/Hand-Held-Tape-Dispensers',
         'https://www.uline.com/Grp_128/Kraft-Tape-Dispensers',
         'https://www.uline.com/Grp_288/Velcro-Brand',
@@ -807,22 +805,22 @@ async function run_case(targetData) {
     temperature: 'sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
 
     dimensions: {
-      originalWidth: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product',
-      width: 'Width of the product, if available, in mm (millimeters). Typically listed in format (width) x (length) Include "value" and "unit" fields.',
-      originalLength: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields.',
-      length: 'Length of the product, in m (meters). Include "value" and "unit" fields.',
-      originalWeight: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields.',
-      weight: 'Width of the product, in g (grams). Include "value" and "unit" fields.',
-      originalThickness: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields.',
-      thickness: 'Thickness of the product, in mm. Include "value" and "unit" fields.',
+      originalWidth: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product. If not available, give null for both fields.',
+      width: 'Width of the product, if available, with unit as "millimeters". Typically listed in format (width) x (length) Include "value" and "unit" fields. If not available, give null for both fields.',
+      originalLength: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+      length: 'Length of the product converted to unit="meters". Include "value" and "unit" fields. If not available, give null for both fields.',
+      originalWeight: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+      weight: 'Width of the product as unit="grams". Include "value" and "unit" fields. If not available, give null for both fields.',
+      originalThickness: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+      thickness: 'Thickness of the product in unit="millimeters". Include "value" and "unit" fields. If not available, give null for both fields.',
     },
 
     rawWithVatProductPrice: `The full raw price of the product. Give full raw price from the site, including shipping and VAT. If multiple prices are listed, give the lowest per unit price. Do not transform it in anyway. Give four fields:
 
 - "value", which is a decimal number in format X.XX
 - "currency", which is a three letter currency code
-- "unit", which is the unit being sold. Give one of "m" or "mm" if it is a measurement, or just "unit" if it is sold as a single unit in the dimensions desecribed above. Always english, always give one of these units.
-- "amount", which is the amount of that unit. if "unit" is "m" or "mm", then give how many of that you are getting. If unit is "unit", then how many tape products are we getting?
+- "unit", which is the unit being sold. Give one of "meters" or "millimeters" if it is a measurement, or just "unit" if it is sold as a single unit in the dimensions desecribed above. Always english, always give one of these units.
+- "amount", which is the amount of that unit. if "unit" is "meters" or "millimeters", then give how many of that you are getting. If unit is "unit", then how many tape products are we getting?
 
 `,
     euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversions:
@@ -873,16 +871,24 @@ China,CNY,8.2350,European Central Bank,2025-07-31
 
     if (false) {
       urls = [
-        'https://www.uline.com/Product/Detail/S-10154/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-3-x-1000-yds-Clear',
+        'https://www.hoffmann-group.com/DE/de/hom/p/083601-48X50',
+
+        // 'https://www.hoffmann-verpackung.de/nachhaltige-verpackung/klebebaender-zubehoer/pet-recycling-klebeband-03-pet5001?c=40',
+        // 'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/kraftpapier-klebeband-mit-1-farb.-druck-kp-1b?c=43',
+        // 'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/kraftpapier-klebeband-mit-1-farb.-druck-kp-1w?c=43',
+        // 'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/kraftpapier-klebeband-mit-2-farb.-druck-kp-2b?c=43',
       ];
     } else if (USE_SAVED_URLS && data?.results?.length > 2) {
       console.log('Not running crawl, using saved URLs');
       urls = data.results;
     } else {
       console.log(`Run crawl with proxy: ${crawlConfig.proxy}, transform: ${selectedTransform}`);
-      const crawlJob = await crawl.detach(crawlConfig);
-      console.log('Crawl progress:', crawlJob.appUrl);
-      crawlResult = await crawlJob.finished();
+      // const crawlJob = await crawl.detach(crawlConfig);
+      // console.log('Crawl progress:', crawlJob.appUrl);
+      // crawlResult = await crawlJob.finished();
+
+      const crawlResult = await crawl(crawlConfig);
+
       urls = (crawlResult.results && crawlResult.results.hits) || [];
     }
     
@@ -909,6 +915,9 @@ China,CNY,8.2350,European Central Bank,2025-07-31
     // const extractJob = await extract.detach(extractConfig);
     // console.log('Extract progress:', extractJob.appUrl);
     // const extractResult = await extractJob.finished();
+
+    console.log('extractConfig:', extractConfig);
+
     const extractResult = await extract(extractConfig);
     const items = (extractResult.results && extractResult.results.items) || [];
 
