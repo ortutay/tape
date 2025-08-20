@@ -3,9 +3,12 @@ import * as fox from 'fetchfox-sdk';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { google } from 'googleapis';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const KEYFILEPATH = 'google-service-account.json';
 
 try {
   const { default: dotenv } = await import('dotenv');
@@ -805,14 +808,21 @@ async function run_case(targetData) {
     temperature: 'sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
 
     dimensions: {
-      originalWidth: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product. If not available, give null for both fields.',
-      width: 'Width of the product, if available, with unit as "millimeters". Typically listed in format (width) x (length) Include "value" and "unit" fields. If not available, give null for both fields.',
-      originalLength: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
-      length: 'Length of the product converted to unit="meters". Include "value" and "unit" fields. If not available, give null for both fields.',
-      originalWeight: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
-      weight: 'Width of the product as unit="grams". Include "value" and "unit" fields. If not available, give null for both fields.',
-      originalThickness: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
-      thickness: 'Thickness of the product in unit="millimeters". Include "value" and "unit" fields. If not available, give null for both fields.',
+      // Width
+      widthOriginal: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product. If not available, give null for both fields.',
+      widthConverted: 'Width of the product, if available, with unit as "millimeters". Typically listed in format (width) x (length) Include "value" and "unit" fields. If not available, give null for both fields.',
+
+      // Length
+      lengthOriginal: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+      lengthConverted: 'Length of the product converted to unit="meters". Include "value" and "unit" fields. If not available, give null for both fields.',
+
+      // Weight
+      weightOriginal: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+      weightConverted: 'Width of the product as unit="grams". Include "value" and "unit" fields. If not available, give null for both fields.',
+
+      // Thickness
+      thicknessOriginal: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+      thicknessConverted: 'Thickness of the product in unit="millimeters". Include "value" and "unit" fields. If not available, give null for both fields.',
     },
 
     rawWithVatProductPrice: `The full raw price of the product. Give full raw price from the site, including shipping and VAT. If multiple prices are listed, give the lowest per unit price. Do not transform it in anyway. Give four fields:
@@ -925,10 +935,10 @@ China,CNY,8.2350,European Central Bank,2025-07-31
 
     for (const item of items) {
       const euros = item.euroProductPrice?.value;
-      const width = item.dimensions?.width?.value / 1000;
+      const width = item.dimensions?.widthConverted?.value / 1000;
       let length;
       if (item.euroProductPrice?.unit == 'unit') {
-        length = item.euroProductPrice?.amount * item.dimensions?.length?.value;
+        length = item.euroProductPrice?.amount * item.dimensions?.lengthConverted?.value;
       } else {
         length = item.euroProductPrice?.amount;
       }
