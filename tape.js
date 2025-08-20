@@ -3,12 +3,9 @@ import * as fox from 'fetchfox-sdk';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { google } from 'googleapis';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const KEYFILEPATH = 'google-service-account.json';
 
 try {
   const { default: dotenv } = await import('dotenv');
@@ -788,7 +785,7 @@ async function run_case(targetData) {
   const { name, customer, pattern, startUrls, ...rest } = targetData;
 
   const template = {
-    isTapeProduct: 'true or false, is this current page a tape product, as in a roll of tape. (not a category page, not a tape accessory, or other non-tape product)',
+    isTape: 'boolean, true or false, is this current page about a roll of tape. give true for rolls of tape, give false for tape dispensers, tape accessories, otoher products that are not rolls of tape',
     name: 'Product name. For this and all other fields, give answers in ENGLISH, translate if necessary',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
     domain: 'The domain (host) of this website, based on the URL',
@@ -796,9 +793,10 @@ async function run_case(targetData) {
     shopName: 'Name of the shop, unique per domain',
     sku: 'Product SKU',
     ean: 'this is a standard product number field used worldwide. most shops have this. some (especially in the U.S.) are using UPC instead of EAN, therefore we should put the UPC also in this field. ofc we should always have 1 number only, EAN prefered.',
-    categoryUrl: 'Category page that contains this product',
-    categoryEnglishName: 'Name of the category for this product, in English, translate if necessary',
-    subCategoryEnglishNames: 'Name of ALL categorty bread crumbs for this product, as an array. In English, translate if necessary,',
+    categoryUrl: 'Category page that contains this product. Give the MOST SPECIFIC category available.',
+    categoryEnglishName: 'Name of that most specific category page for this product, in English, translate if necessary.',
+    subCategoryUrls: 'List of ALL category URLs for this product, as an array',
+    subCategoryEnglishNames: 'Name of ALL category bread crumbs for this product, as an array. In English, translate if necessary,',
     description: 'text from a description field that describes the product, in English, translate if necessary',
 
     color: 'Color of the product, in English, translate if necessary',
@@ -807,23 +805,21 @@ async function run_case(targetData) {
     backing: 'the backing of the adhesive tape, e.g. acrylic foam, in English, translate if necessary',
     temperature: 'sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
 
-    dimensions: {
-      // Width
-      widthOriginal: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product. If not available, give null for both fields.',
-      widthConverted: 'Width of the product, if available, with unit as "millimeters". Typically listed in format (width) x (length) Include "value" and "unit" fields. If not available, give null for both fields.',
+    // Width
+    widthOriginal: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product. If not available, give null for both fields.',
+    widthConverted: 'Width of the product, if available, with unit as "millimeters". Typically listed in format (width) x (length) Include "value" and "unit" fields. If not available, give null for both fields.',
 
-      // Length
-      lengthOriginal: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
-      lengthConverted: 'Length of the product converted to unit="meters". Include "value" and "unit" fields. If not available, give null for both fields.',
+    // Length
+    lengthOriginal: 'Length of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+    lengthConverted: 'Length of the product converted to unit="meters". Include "value" and "unit" fields. If not available, give null for both fields.',
 
-      // Weight
-      weightOriginal: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
-      weightConverted: 'Width of the product as unit="grams". Include "value" and "unit" fields. If not available, give null for both fields.',
+    // Weight
+    weightOriginal: 'Width of the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+    weightConverted: 'Width of the product as unit="grams". Include "value" and "unit" fields. If not available, give null for both fields.',
 
-      // Thickness
-      thicknessOriginal: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
-      thicknessConverted: 'Thickness of the product in unit="millimeters". Include "value" and "unit" fields. If not available, give null for both fields.',
-    },
+    // Thickness
+    thicknessOriginal: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
+    thicknessConverted: 'Thickness of the product in unit="millimeters". Include "value" and "unit" fields. If not available, give null for both fields.',
 
     rawWithVatProductPrice: `The full raw price of the product. Give full raw price from the site, including shipping and VAT. If multiple prices are listed, give the lowest per unit price. Do not transform it in anyway. Give four fields:
 
@@ -833,7 +829,7 @@ async function run_case(targetData) {
 - "amount", which is the amount of that unit. if "unit" is "meters" or "millimeters", then give how many of that you are getting. If unit is "unit", then how many tape products are we getting?
 
 `,
-    euroProductPrice: `Convert the raw product price price to euros, giving a dictionaryi with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversions:
+    euroProductPrice: `Convert the raw product price price to euros, giving a dictionary with four fields: "value" which is a decimal number X.XX, and "currency" which is EUR, and "unit" and "amount" as before. Use these conversions:
 
 Country,Currency Code,1 EUR Equals,Source,Date
 United Kingdom,GBP,0.8649,European Central Bank,2025-07-31
@@ -842,7 +838,6 @@ Sweden,SEK,11.1575,European Central Bank,2025-07-31
 Poland,PLN,4.2728,European Central Bank,2025-07-31
 China,CNY,8.2350,European Central Bank,2025-07-31
 `
-    
   };
 
   console.log(`\n=== Processing ${name} (${customer}) ===`);
@@ -879,9 +874,20 @@ China,CNY,8.2350,European Central Bank,2025-07-31
     // Try to get URLs from the API
     const data = USE_SAVED_URLS ? await fox.urls.list({ pattern: crawlConfig.pattern }) : {};
 
-    if (false) {
+    if (true) {
       urls = [
-        'https://www.hoffmann-group.com/DE/de/hom/p/083601-48X50',
+        'https://www.uline.com/Product/Detail/H-167/Desktop-Tape-Dispensers/Uline-Standard-Bag-Taper-3-8-Capacity',
+        'https://www.uline.com/Product/Detail/H-2650/Desk-Accessories/2-Roll-Tape-Starter-Pack-2-x-55-yds',
+        'https://www.uline.com/Product/Detail/H-726/Tape-Dispensers-Hand-Held/Uline-Supermask-Tape-Dispenser',
+        'https://www.uline.com/Product/Detail/S-10153/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-2-x-1000-yds-Clear',
+        'https://www.uline.com/Product/Detail/S-10154/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-3-x-1000-yds-Clear',
+        'https://www.uline.com/Product/Detail/S-10173/3M-Carton-Sealing-Tape/3M-142-Shipping-Tape-with-Dispenser-Clear-2-x-222-yds',
+        'https://www.uline.com/Product/Detail/S-10174/3M-Carton-Sealing-Tape/3M-355-Hot-Melt-Machine-Length-Tape-2-x-1000-yds-Clear',
+        'https://www.uline.com/Product/Detail/S-10310/3M-Foil-Tape/3M-425-Aluminum-Foil-Tape-1-x-60-yds',
+        'https://www.uline.com/Product/Detail/S-10311/3M-Foil-Tape/3M-425-Aluminum-Foil-Tape-2-x-60-yds',
+        'https://www.uline.com/Product/Detail/S-10524/Double-Sided-Tape/Double-Sided-Film-Tape-3-4-x-60-yds',
+
+        // 'https://www.hoffmann-group.com/DE/de/hom/p/083601-48X50',
 
         // 'https://www.hoffmann-verpackung.de/nachhaltige-verpackung/klebebaender-zubehoer/pet-recycling-klebeband-03-pet5001?c=40',
         // 'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/kraftpapier-klebeband-mit-1-farb.-druck-kp-1b?c=43',
@@ -935,10 +941,10 @@ China,CNY,8.2350,European Central Bank,2025-07-31
 
     for (const item of items) {
       const euros = item.euroProductPrice?.value;
-      const width = item.dimensions?.widthConverted?.value / 1000;
+      const width = item.widthConverted?.value / 1000;
       let length;
       if (item.euroProductPrice?.unit == 'unit') {
-        length = item.euroProductPrice?.amount * item.dimensions?.lengthConverted?.value;
+        length = item.euroProductPrice?.amount * item.lengthConverted?.value;
       } else {
         length = item.euroProductPrice?.amount;
       }
