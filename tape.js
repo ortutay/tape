@@ -220,7 +220,7 @@ const SCRAPING_TARGETS = [
         'https://www.rshughes.com/c/**Tape**start_item=*',
       ],
     },
-    contentTransform: 'text_only',
+    contentTransform: 'reduce',
     maxDepth: 1,
     maxVisits: 50,
     crawlStrategy: 'dfs',
@@ -837,6 +837,10 @@ Switzerland,CHF,0.9297,European Central Bank,2025-07-31
 Sweden,SEK,11.1575,European Central Bank,2025-07-31
 Poland,PLN,4.2728,European Central Bank,2025-07-31
 China,CNY,8.2350,European Central Bank,2025-07-31
+United States,USD,1.1651,European Central Bank,2025-08-20
+Japan,JPY,172.67,European Central Bank,2025-08-19
+Canada,CAD,1.6167,X-Rates,2025-08-20
+Australia,AUD,1.8116,X-Rates,2025-08-20
 `
   };
 
@@ -928,13 +932,13 @@ China,CNY,8.2350,European Central Bank,2025-07-31
     }
 
     console.log(`Run extract with ${limitedUrls.length} URLs, mode: ${selectedExtractMode}`);
-    // const extractJob = await extract.detach(extractConfig);
-    // console.log('Extract progress:', extractJob.appUrl);
-    // const extractResult = await extractJob.finished();
-
     console.log('extractConfig:', extractConfig);
 
-    const extractResult = await extract(extractConfig);
+    const extractJob = await extract.detach(extractConfig);
+    console.log('Extract progress:', extractJob.appUrl);
+    const extractResult = await extractJob.finished();
+    // const extractResult = await extract(extractConfig);
+
     const items = (extractResult.results && extractResult.results.items) || [];
 
     console.log('Items extracted:', items.length);
