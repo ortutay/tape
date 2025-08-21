@@ -15,10 +15,11 @@ try {
 }
 
 const workingShops = [
-  'de_hoffmann_verpackung',
-  'de_hoffmann_group',
-  'us_rs_hughes',
-  'us_uline',
+  // 'de_hoffmann_verpackung',
+  // 'de_hoffmann_group',
+  // 'us_rs_hughes',
+  // 'us_uline',
+
   'de_sks',
   'de_seyffer',
 
@@ -885,7 +886,7 @@ Australia,AUD,1.8116,X-Rates,2025-08-20
     // Try to get URLs from the API
     const data = USE_SAVED_URLS ? await fox.urls.list({ pattern: crawlConfig.pattern }) : {};
 
-    if (true) {
+    if (false) {
       urls = [
         'https://seyffer.shop/de/3m-4411-hochleistungs-dichtband-4411-w50-50-mm-x-33-m-1-mm-weiss-universelle-haftung-fuer-saubere-abdichtungen.html',
         'https://seyffer.shop/de/3m-5425-25-mm-x-33-m-0-11-mm-transparent-uhmw-polyethylen-gleitklebeband.html',
