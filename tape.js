@@ -17,10 +17,15 @@ try {
 const workingShops = [
   'de_hoffmann_verpackung',
   'de_hoffmann_group',
-  // 'cn_ehsy',
   'us_rs_hughes',
   'us_uline',
-]
+  'de_sks',
+  'de_seyffer',
+
+  // Priority shops below:
+// 'int_rs_components',
+// 'int_rubix',
+];
 
 // ============================================================================
 // FETCHFOX CONFIGURATION OPTIONS - Edit these to change behavior
@@ -55,9 +60,9 @@ const PROXY_OPTIONS = {
 const TRANSFORM_OPTIONS = {
   // Usually good
   'reduce': 'x',        // Reduces content intelligently (similar to SDK default)
+  'slim_html': '',      // Removes unnecessary HTML
 
   'text_only': '',      // Extracts only text content
-  'slim_html': '',      // Removes unnecessary HTML
   'full_html': '',           // No transformation (full HTML)
 };
 
@@ -257,7 +262,7 @@ const SCRAPING_TARGETS = [
   {
     name: 'de_sks',
     customer: 'SKS',
-    pattern: 'https://www.shop-sks.com/:*',
+    pattern: 'https://www.shop-sks.com/*',
     startUrls: [
       'https://www.shop-sks.com/3M/Kleben-und-Verbinden/Einseitige-Klebebaender/?p={{0..20}}',
       'https://www.shop-sks.com/3M/Kleben-und-Verbinden/Doppelseitige-Klebebaender/?p={{0..20}}',
@@ -266,6 +271,7 @@ const SCRAPING_TARGETS = [
       'https://www.shop-sks.com/tesa/Klischeebaender/?p={{0..10}}',
       'https://www.shop-sks.com/tesa/Lasergravurfolie/?p={{0..10}}',
     ],
+    contentTransform: 'slim_html',
   },
   {
     name: 'pl_semicon',
@@ -283,6 +289,7 @@ const SCRAPING_TARGETS = [
       'https://seyffer.shop/de/kleben/einseitige-klebebaender/?view_mode=tiled&listing_sort=&listing_count=72&page={{0..30}}',
       'https://seyffer.shop/de/kleben/doppelseitige-klebebaender/?view_mode=tiled&listing_sort=&listing_count=72&page={{0..30}}',
     ],
+    contentTransform: 'slim_html',
   },
   {
     name: 'ch_ibz',
@@ -880,16 +887,30 @@ Australia,AUD,1.8116,X-Rates,2025-08-20
 
     if (true) {
       urls = [
-        'https://www.uline.com/Product/Detail/H-167/Desktop-Tape-Dispensers/Uline-Standard-Bag-Taper-3-8-Capacity',
-        'https://www.uline.com/Product/Detail/H-2650/Desk-Accessories/2-Roll-Tape-Starter-Pack-2-x-55-yds',
-        'https://www.uline.com/Product/Detail/H-726/Tape-Dispensers-Hand-Held/Uline-Supermask-Tape-Dispenser',
-        'https://www.uline.com/Product/Detail/S-10153/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-2-x-1000-yds-Clear',
-        'https://www.uline.com/Product/Detail/S-10154/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-3-x-1000-yds-Clear',
-        'https://www.uline.com/Product/Detail/S-10173/3M-Carton-Sealing-Tape/3M-142-Shipping-Tape-with-Dispenser-Clear-2-x-222-yds',
-        'https://www.uline.com/Product/Detail/S-10174/3M-Carton-Sealing-Tape/3M-355-Hot-Melt-Machine-Length-Tape-2-x-1000-yds-Clear',
-        'https://www.uline.com/Product/Detail/S-10310/3M-Foil-Tape/3M-425-Aluminum-Foil-Tape-1-x-60-yds',
-        'https://www.uline.com/Product/Detail/S-10311/3M-Foil-Tape/3M-425-Aluminum-Foil-Tape-2-x-60-yds',
-        'https://www.uline.com/Product/Detail/S-10524/Double-Sided-Tape/Double-Sided-Film-Tape-3-4-x-60-yds',
+        'https://seyffer.shop/de/3m-4411-hochleistungs-dichtband-4411-w50-50-mm-x-33-m-1-mm-weiss-universelle-haftung-fuer-saubere-abdichtungen.html',
+        'https://seyffer.shop/de/3m-5425-25-mm-x-33-m-0-11-mm-transparent-uhmw-polyethylen-gleitklebeband.html',
+        'https://seyffer.shop/de/3m-431-38-mm-x-50-m-0-09-mm-silber-aluminiumklebeband.html',
+        'https://seyffer.shop/de/3m-4410-hochleistungs-dichtband-4410-g76-76-mm-x-33-m-0-6-mm-grau-universelle-haftung-fuer-saubere-abdichtungen.html',
+
+        // 'https://www.shop-sks.com/3M-361-Glasgewebeband-Weiss-25-4-mm-x-55m-0-17-mm',
+        // 'https://www.shop-sks.com/3M-389-Gewebeband-50-mm-x-50-m-gelb',
+        // 'https://www.shop-sks.com/3M-5421-UHMW-Polyethylen-Gleitklebeband-19mmx16-5m-0-17mm-Gummi-Harz',
+        // 'https://www.shop-sks.com/3M-5423-UHMW-Polyethylen-Gleitklebeband-19mmx16-5m-0-28mm-Gummi-Harz',
+
+        // 'https://www.shop-sks.com/3M-5421-UHMW-Polyethylen-Gleitklebeband-19mmx16-5m-0-17mm-Gummi-Harz',
+
+        // 'https://seyffer.shop/de/3m-4410-hochleistungs-dichtband-4410-g76-76-mm-x-33-m-0-6-mm-grau-universelle-haftung-fuer-saubere-abdichtungen.html',
+
+        // 'https://www.uline.com/Product/Detail/H-167/Desktop-Tape-Dispensers/Uline-Standard-Bag-Taper-3-8-Capacity',
+        // 'https://www.uline.com/Product/Detail/H-2650/Desk-Accessories/2-Roll-Tape-Starter-Pack-2-x-55-yds',
+        // 'https://www.uline.com/Product/Detail/H-726/Tape-Dispensers-Hand-Held/Uline-Supermask-Tape-Dispenser',
+        // 'https://www.uline.com/Product/Detail/S-10153/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-2-x-1000-yds-Clear',
+        // 'https://www.uline.com/Product/Detail/S-10154/3M-Carton-Sealing-Tape/3M-373-Hot-Melt-Machine-Length-Tape-3-x-1000-yds-Clear',
+        // 'https://www.uline.com/Product/Detail/S-10173/3M-Carton-Sealing-Tape/3M-142-Shipping-Tape-with-Dispenser-Clear-2-x-222-yds',
+        // 'https://www.uline.com/Product/Detail/S-10174/3M-Carton-Sealing-Tape/3M-355-Hot-Melt-Machine-Length-Tape-2-x-1000-yds-Clear',
+        // 'https://www.uline.com/Product/Detail/S-10310/3M-Foil-Tape/3M-425-Aluminum-Foil-Tape-1-x-60-yds',
+        // 'https://www.uline.com/Product/Detail/S-10311/3M-Foil-Tape/3M-425-Aluminum-Foil-Tape-2-x-60-yds',
+        // 'https://www.uline.com/Product/Detail/S-10524/Double-Sided-Tape/Double-Sided-Film-Tape-3-4-x-60-yds',
 
         // 'https://www.hoffmann-group.com/DE/de/hom/p/083601-48X50',
 
@@ -903,11 +924,10 @@ Australia,AUD,1.8116,X-Rates,2025-08-20
       urls = data.results;
     } else {
       console.log(`Run crawl with proxy: ${crawlConfig.proxy}, transform: ${selectedTransform}`);
-      // const crawlJob = await crawl.detach(crawlConfig);
-      // console.log('Crawl progress:', crawlJob.appUrl);
-      // crawlResult = await crawlJob.finished();
-
-      const crawlResult = await crawl(crawlConfig);
+      const crawlJob = await crawl.detach(crawlConfig);
+      console.log('Crawl progress:', crawlJob.appUrl);
+      crawlResult = await crawlJob.finished();
+      // const crawlResult = await crawl(crawlConfig);
 
       urls = (crawlResult.results && crawlResult.results.hits) || [];
     }
