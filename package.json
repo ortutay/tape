@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "fetchfox-sdk": "^1.0.18"
+    "fetchfox-sdk": "^1.0.18",
+    "radash": "^12.1.1"
   }
 }

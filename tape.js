@@ -15,11 +15,10 @@ try {
 }
 
 const workingShops = [
-  // 'de_hoffmann_verpackung',
-  // 'de_hoffmann_group',
-  // 'us_rs_hughes',
-  // 'us_uline',
-
+  'de_hoffmann_verpackung',
+  'de_hoffmann_group',
+  'us_rs_hughes',
+  'us_uline',
   'de_sks',
   'de_seyffer',
 
