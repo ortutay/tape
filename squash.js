@@ -63,12 +63,57 @@ const main = async () => {
     }
   }
 
-  const headers = {};
-  for (const row of rows) {
-    console.log(row);
-    for (const key of Object.keys(row)) {
-      headers[key] = true;
-    }
+  // const headers = {};
+  // for (const row of rows) {
+  //   console.log(row);
+  //   for (const key of Object.keys(row)) {
+  //     headers[key] = true;
+  //   }
+  // }
+
+  const headers = {
+    '_url': true,
+    '_htmlUrl': true,
+    'isTape': true,
+    'brand': true,
+    'name': true,
+    'shopName': true,
+    'country': true,
+    'domain': true,
+    'eurPerSqm': true,
+    'sku': true,
+    'ean': true,
+    'categoryUrl': true,
+    'categoryEnglishName': true,
+    'description': true,
+    'color': true,
+    'material': true,
+    'type': true,
+    'backing': true,
+    'temperature.0.value': true,
+    'temperature.0.unit': true,
+    'widthOriginal.value': true,
+    'widthOriginal.unit': true,
+    'widthConverted.value': true,
+    'widthConverted.unit': true,
+    'lengthOriginal.value': true,
+    'lengthOriginal.unit': true,
+    'lengthConverted.value': true,
+    'lengthConverted.unit': true,
+    'weightOriginal': true,
+    'weightConverted': true,
+    'thicknessOriginal.value': true,
+    'thicknessOriginal.unit': true,
+    'thicknessConverted.value': true,
+    'thicknessConverted.unit': true,
+    'rawWithVatProductPrice.value': true,
+    'rawWithVatProductPrice.currency': true,
+    'rawWithVatProductPrice.unit': true,
+    'rawWithVatProductPrice.amount': true,
+    'euroProductPrice.value': true,
+    'euroProductPrice.currency': true,
+    'euroProductPrice.unit': true,
+    '_confidence': true,
   }
 
   rows.unshift(headers);

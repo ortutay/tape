@@ -59,8 +59,8 @@ const PROXY_OPTIONS = {
 // Mark with 'x' to select which transform method to use
 const TRANSFORM_OPTIONS = {
   // Usually good
-  'reduce': 'x',        // Reduces content intelligently (similar to SDK default)
-  'slim_html': '',      // Removes unnecessary HTML
+  'reduce': '',        // Reduces content intelligently (similar to SDK default)
+  'slim_html': 'x',      // Removes unnecessary HTML
 
   'text_only': '',      // Extracts only text content
   'full_html': '',           // No transformation (full HTML)
@@ -793,24 +793,44 @@ async function run_case(targetData) {
 
   const template = {
     isTape: 'boolean, true or false, is this current page about a roll of tape. give true for rolls of tape, give false for tape dispensers, tape accessories, otoher products that are not rolls of tape',
+
+    // Basic info
     name: 'Product name. For this and all other fields, give answers in ENGLISH, translate if necessary',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
     domain: 'The domain (host) of this website, based on the URL',
     country: 'The two letter country code of this website, based on the URL, lower case',
     shopName: 'Name of the shop, unique per domain',
+
+    // Product ID codes
+    tesaBnr: 'If the product is a Tesa brand tape, give the BNR number. It is a 4 digit product code, usually in the name of the product, eg. TESA 4120 means BNR is 4120. If not a Tesa product, leave this null',
     sku: 'Product SKU',
     ean: 'this is a standard product number field used worldwide. most shops have this. some (especially in the U.S.) are using UPC instead of EAN, therefore we should put the UPC also in this field. ofc we should always have 1 number only, EAN prefered.',
-    categoryUrl: 'Category page that contains this product. Give the MOST SPECIFIC category available.',
-    categoryEnglishName: 'Name of that most specific category page for this product, in English, translate if necessary.',
-    subCategoryUrls: 'List of ALL category URLs for this product, as an array',
-    subCategoryEnglishNames: 'Name of ALL category bread crumbs for this product, as an array. In English, translate if necessary,',
-    description: 'text from a description field that describes the product, in English, translate if necessary',
 
-    color: 'Color of the product, in English, translate if necessary',
-    material: 'could be anything, paper, pvc etc. its the material of the adhesive tape, in English, translate if necessary',
-    type: 'Type of adhesive: e.g. acrylic or rubber, in English, translate if necessary',
-    backing: 'the backing of the adhesive tape, e.g. acrylic foam, in English, translate if necessary',
-    temperature: 'sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
+    // Category fields
+    categoryUrl: 'Category page that contains this product. Give the MOST SPECIFIC category available.',
+    subCategoryUrls: 'List of ALL category URLs for this product, as an array',
+
+    // Language fields
+    // First in original language...
+    categoryOriginalLanguage: 'Name of that most specific category page for this product, in the original language, word-for-word copy.',
+    subCategoryOriginalLanguage: 'Name of ALL category bread crumbs for this product, as an array, in the original language, word-for-word copy.',
+    descriptionOriginalLanguage: 'text from a description field that describes the product, in the original language, word-for-word copy',
+    colorOriginalLanguage: 'Color of the product, in the original language, word-for-word copy',
+    materialOriginalLanguage: 'could be anything, paper, pvc etc. its the material of the adhesive tape, in the original language, word-for-word copy',
+    typeOriginalLanguage: 'Type of adhesive: e.g. acrylic or rubber, in the original language, word-for-word copy',
+    backingOriginalLanguage: 'the backing of the adhesive tape, e.g. acrylic foam, in the original language, word-for-word copy',
+
+    // ...then in English
+    categoryEnglish: 'Name of that most specific category page for this product, in English, translate if necessary.',
+    subCategoryEnglish: 'Name of ALL category bread crumbs for this product, as an array. In English, translate if necessary,',
+    descriptionEnglish: 'text from a description field that describes the product, in English, translate if necessary',
+    colorEnglish: 'Color of the product, in English, translate if necessary',
+    materialEnglish: 'could be anything, paper, pvc etc. its the material of the adhesive tape, in English, translate if necessary',
+    typeEnglish: 'Type of adhesive: e.g. acrylic or rubber, in English, translate if necessary',
+    backingEnglish: 'the backing of the adhesive tape, e.g. acrylic foam, in English, translate if necessary',
+
+    // Technical details
+    temperature: 'Sometimes we have one, something two values. one value is often -x °C and the other is x°C (range from minus to plus), e.g. -54 °C - 149 °C. Format: array of "value" and "unit".',
 
     // Width
     widthOriginal: 'Width of the product, if available, in the original units, as a dictionary. Dictionary fields for all dimensions must be "value", and "unit", value is a number and unit is a measurement unit. For this field and any other dimension fields, if there are multiple products, pick the first one or main one. All dimensions must be for the same product. If not available, give null for both fields.',
@@ -828,6 +848,7 @@ async function run_case(targetData) {
     thicknessOriginal: 'Thickness  the product, in the unit listed on the site. Include "value" and "unit" fields. If not available, give null for both fields.',
     thicknessConverted: 'Thickness of the product in unit="millimeters". Include "value" and "unit" fields. If not available, give null for both fields.',
 
+    // Pricing
     rawWithVatProductPrice: `The full raw price of the product. Give full raw price from the site, including shipping and VAT. If multiple prices are listed, give the lowest per unit price. Do not transform it in anyway. Give four fields:
 
 - "value", which is a decimal number in format X.XX
