@@ -35,7 +35,8 @@ const workingShops = [
 const api_key = process.env.FETCHFOX_API_KEY;
 configure({
   apiKey: api_key,
-  host: 'https://dev.api.fetchfox.ai',
+  // host: 'https://dev.api.fetchfox.ai',
+  host: 'https://api.fetchfox.ai',
 });
 
 // Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
@@ -114,7 +115,7 @@ const SCRAPING_TARGETS = [
   {
     name: 'de_haberkorn',
     customer: 'Haberkorn',
-    pattern: 'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/*l=3',
+    pattern: 'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/**l=3',
     startUrls: [
       'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/klebebaender-einseitig?page={{1..20}}',
       'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/klebebaender-doppelseitig?page={{1..20}}',
@@ -128,7 +129,7 @@ const SCRAPING_TARGETS = [
   {
     name: 'no_norengros',
     customer: 'Norengros',
-    pattern: 'https://www.norengros.no/product/*',
+    pattern: 'https://www.norengros.no/product/**',
     startUrls: [
       'https://www.norengros.no/category/emballasje/tape?page={{0..20}}',
     ],
@@ -139,19 +140,20 @@ const SCRAPING_TARGETS = [
   {
     name: 'us_fastenal',
     customer: 'Fastenal',
-    pattern: 'https://www.fastenal.com/product/Adhesives*?productFamilyId=*',
+    // pattern: 'https://www.fastenal.com/product/Adhesives*?productFamilyId=*',
+    pattern: 'https://www.fastenal.com/product/details/*',
     startUrls: [
       'https://www.fastenal.com/product/Adhesives%2C%20Sealants%2C%20and%20Tape/Tape?categoryId=601991',
     ],
     priority: {
       only: [
-        'https://www.fastenal.com/product/Adhesives%2C%20Sealants%2C%20and%20Tape/Tape/*',
+        'https://www.fastenal.com/product/Adhesives%2C%20Sealants%2C%20and%20Tape/Tape/**',
       ],
     },
     crawlStrategy: 'dfs',
     maxDepth: 3,
     maxVisits: 100,
-    perPage: 'many',
+    // perPage: 'many',
   },
 
   {
@@ -168,13 +170,13 @@ const SCRAPING_TARGETS = [
   {
     name: 'de_eriks',
     customer: 'Eriks',
-    pattern: 'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender-abdeck-klebebaender/*',
+    pattern: 'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender-abdeck-klebebaender/*/',
     startUrls: [
       'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender/',
     ],
     priority: {
       only: [
-        'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender*',
+        'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender**',
       ],
     },
     maxDepth: 3,
@@ -186,13 +188,13 @@ const SCRAPING_TARGETS = [
   {
     name: 'de_tme',
     customer: 'Transfer Multisort Elektronik',
-    pattern: 'https://www.tme.eu/de/details/*',
+    pattern: 'https://www.tme.eu/de/details/**',
     startUrls: [
       'https://www.tme.eu/de/katalog/warn-und-markierungsbander_113787/?page={{1..20}}',
 	    'https://www.tme.eu/de/katalog/bander_112715/?page={{1..20}}',
     ],
     maxDepth: 0,
-    maxVisits: 10,
+    maxVisits: 40,
     loadWait: 6000,
   },
 
@@ -257,6 +259,19 @@ const SCRAPING_TARGETS = [
     maxDepth: 2,
     maxVisits: 100,
     crawlStrategy: 'dfs',
+  },
+
+  {
+    name: 'us_crown',
+    customer: 'Crown',
+    pattern: 'https://shop.crown.com/crown/en/**Tape**/p/**',
+    startUrls: [
+      'https://shop.crown.com/crown/en/General-Supplies/Service-Supplies/Tape-Packaging/c/tape_packaging',
+      'https://shop.crown.com/crown/en/General-Supplies/Warehouse/Floor-Tape/c/floor_tape',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+    interact: true,
   },
 
   {
