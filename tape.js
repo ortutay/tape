@@ -35,8 +35,8 @@ const workingShops = [
 const api_key = process.env.FETCHFOX_API_KEY;
 configure({
   apiKey: api_key,
-  // host: 'https://dev.api.fetchfox.ai',
-  host: 'https://api.fetchfox.ai',
+  host: 'https://dev.api.fetchfox.ai',
+  // host: 'https://api.fetchfox.ai',
 });
 
 // Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
@@ -269,6 +269,34 @@ const SCRAPING_TARGETS = [
       'https://shop.crown.com/crown/en/General-Supplies/Service-Supplies/Tape-Packaging/c/tape_packaging',
       'https://shop.crown.com/crown/en/General-Supplies/Warehouse/Floor-Tape/c/floor_tape',
     ],
+    maxDepth: 0,
+    maxVisits: 10,
+    interact: true,
+  },
+
+  {
+    name: 'us_msc',
+    customer: 'MSC',
+    pattern: 'https://www.mscdirect.com/product/details/*',
+    startUrls: [
+      'https://www.mscdirect.com/browse/Tapes-Adhesives/Tape?navid=2108684',
+    ],
+    priority: {
+      only: 'https://www.mscdirect.com/browse**',
+    },
+    proxy: 'auto',
+    maxDepth: 1,
+    maxVisits: 100,
+  },
+
+  {
+    name: 'us_motion',
+    customer: 'Motion',
+    pattern: 'https://www.motion.com/products/sku/*',
+    startUrls: [
+      'https://www.motion.com/products/Adhesives,%20Sealants%20and%20Tape/Tape',
+    ],
+    proxy: 'auto',
     maxDepth: 0,
     maxVisits: 10,
     interact: true,
