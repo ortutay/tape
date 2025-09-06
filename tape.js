@@ -874,7 +874,7 @@ async function run_case(targetData) {
     shopName: 'Name of the shop, unique per domain',
 
     // Product ID codes
-    tesaBnr: 'If the product is a Tesa brand tape, give the BNR number. It is a 4 digit product code, usually in the name of the product, eg. TESA 4120 means BNR is 4120. If not a Tesa product, leave this null',
+    tesaBnr: 'If the product is a Tesa brand tape, give the BNR number. It is a 4 or 5 digit product code, usually in the name of the product, eg. TESA 4120 means BNR is 4120, TESA 55667 means BNR is 55667, etc. If not a Tesa product, leave this null',
     sku: 'Product SKU',
     ean: 'this is a standard product number field used worldwide. most shops have this. some (especially in the U.S.) are using UPC instead of EAN, therefore we should put the UPC also in this field. ofc we should always have 1 number only, EAN prefered.',
 
