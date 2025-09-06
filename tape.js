@@ -77,7 +77,8 @@ const EXTRACT_MODES = {
 // PROCESSING LIMITS - Following SDK approach
 const MAX_DEPTH = 3;           // Crawl depth limit (0 = current page only)
 const MAX_VISITS = 20;        // Maximum pages to visit during crawl
-const MAX_EXTRACTS = 100;      // Limit URLs for extraction (cost control)
+// const MAX_EXTRACTS = 100;      // Limit URLs for extraction (cost control)
+const MAX_EXTRACTS = 20;      // Limit URLs for extraction (cost control)
 
 // ============================================================================
 // SCRAPING TARGETS - Enhanced with pagination templates and customer info
@@ -300,6 +301,34 @@ const SCRAPING_TARGETS = [
     maxDepth: 0,
     maxVisits: 10,
     interact: true,
+  },
+
+  {
+    name: 'us_grainger',
+    customer: 'Grainger',
+    pattern: 'https://www.grainger.com/product/*',
+    startUrls: [
+      'https://www.grainger.com/category/adhesives-sealants-and-tape/tape',
+    ],
+    priority: {
+      only: [
+        'https://www.grainger.com/category/adhesives-sealants-and-tape/tape/**',
+      ]
+    },
+    maxDepth: 2,
+    maxVisits: 100,
+    proxy: 'auto',
+  },
+
+  {
+    name: 'br_neo_brasil',
+    customer: 'Neo Brasil',
+    pattern: 'https://www.lojaneobrasil.com.br/fitas-adesivas/**',
+    startUrls: [
+      'https://www.lojaneobrasil.com.br/fitas-adesivas?pg={{1..20}}',
+    ],
+    maxDepth: 0,
+    maxVisits: 100,
   },
 
   {
