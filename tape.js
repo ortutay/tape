@@ -84,10 +84,21 @@ const MAX_EXTRACTS = 20;      // Limit URLs for extraction (cost control)
 // SCRAPING TARGETS - Enhanced with pagination templates and customer info
 // ============================================================================
 
+const COPY_KEYS = [
+  'ranking',
+  'name',
+  'dmu',
+  'soldTo',
+];
+
 const SCRAPING_TARGETS = [
   {
+    ranking: '1',
     name: 'de_hoffmann_verpackung',
-    customer: 'Carl Bernh. Hoffmann GmbH & Co. KG',
+    dmu: 'Carl Bernh. Hoffmann GmbH & Co. KG',
+    soldTo: 'Carl Bernh. Hoffmann',
+
+    // customer: 'Carl Bernh. Hoffmann GmbH & Co. KG',
     pattern: 'https://www.hoffmann-verpackung.de/**c=**',
     startUrls: [
       'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband/?p=1&o=2&n=100',
@@ -101,8 +112,11 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '2',
     name: 'de_hoffmann_group',
-    customer: 'Hoffmann Group',
+    dmu: 'Hoffmann GmbH',
+    soldTo: 'Hoffmann GmbH',
+
     pattern: 'https://www.hoffmann-group.com/DE/de/hom/p/*',
     startUrls: [
       'https://www.hoffmann-group.com/DE/de/hom/Chemisch-technische-Produkte/Klebeb%C3%A4nder/c/06-07-00-00-00',
@@ -114,8 +128,10 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '3',
     name: 'de_haberkorn',
-    customer: 'Haberkorn',
+    dmu: 'Haberkorn',
+    soldTo: 'Haberkorn GmbH',
     pattern: 'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/**l=3',
     startUrls: [
       'https://www.haberkorn.com/at/de/chemisch-technische-produkte/klebetechnik/klebebaender-einseitig?page={{1..20}}',
@@ -128,8 +144,11 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '4',
     name: 'no_norengros',
-    customer: 'Norengros',
+    dmu: 'NORENGROS',
+    soldTo: 'NORENGROS NB ENGROS',
+
     pattern: 'https://www.norengros.no/product/**',
     startUrls: [
       'https://www.norengros.no/category/emballasje/tape?page={{0..20}}',
@@ -139,9 +158,11 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '5',
     name: 'us_fastenal',
-    customer: 'Fastenal',
-    // pattern: 'https://www.fastenal.com/product/Adhesives*?productFamilyId=*',
+    dmu: 'FASTENAL',
+    soldTo: 'FASTENAL EUROPE LTD',
+
     pattern: 'https://www.fastenal.com/product/details/*',
     startUrls: [
       'https://www.fastenal.com/product/Adhesives%2C%20Sealants%2C%20and%20Tape/Tape?categoryId=601991',
@@ -869,9 +890,8 @@ async function run_case(targetData) {
     // Basic info
     name: 'Product name. For this and all other fields, give answers in ENGLISH, translate if necessary',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
-    domain: 'The domain (host) of this website, based on the URL',
+    domain: 'The domain (host) of this website, based on the URL. Format must be https://www.example.com',
     country: 'The two letter country code of this website, based on the URL, lower case',
-    shopName: 'Name of the shop, unique per domain',
 
     // Product ID codes
     tesaBnr: 'If the product is a Tesa brand tape, give the BNR number. It is a 4 or 5 digit product code, usually in the name of the product, eg. TESA 4120 means BNR is 4120, TESA 55667 means BNR is 55667, etc. If not a Tesa product, leave this null',
@@ -1057,6 +1077,10 @@ Australia,AUD,1.8116,X-Rates,2025-08-20
     console.log('Items extracted:', items.length);
 
     for (const item of items) {
+      for (const copyKey of COPY_KEYS) {
+        item[copyKey] = targetData[copyKey];
+      }
+
       const euros = item.euroProductPrice?.value;
       const width = item.widthConverted?.value / 1000;
       let length;
@@ -1159,7 +1183,7 @@ async function run() {
   console.log(`- Max Extracts: ${MAX_EXTRACTS}`);
 
   console.log('\nResults:');
-  console.log('Shop\t\t\tCustomer\t\tItems\tCost\t\tCost/1k');
+  console.log('Shop\t\t\tSoldTo\t\tItems\tCost\t\tCost/1k');
   console.log('-'.repeat(90));
   
   let totalItems = 0;
@@ -1167,9 +1191,9 @@ async function run() {
 
   for (const result of results) {
     if (result.error) {
-      console.log(`${result.name.padEnd(15)}\t${result.customer.padEnd(15)}\tERROR: ${result.error}`);
+      console.log(`${result.name.padEnd(15)}\t${result.soldTo.padEnd(15)}\tERROR: ${result.error}`);
     } else {
-      console.log(`${result.name.padEnd(15)}\t${result.customer.padEnd(15)}\t${result.items.length}\t$${result.cost.toFixed(4)}\t\t$${result.costPer1k.toFixed(2)}`);
+      console.log(`${result.name.padEnd(15)}\t${result.soldTo.padEnd(15)}\t${result.items.length}\t$${result.cost.toFixed(4)}\t\t$${result.costPer1k.toFixed(2)}`);
       totalItems += result.items.length;
       totalCosts += result.cost;
     }
