@@ -35,8 +35,8 @@ const workingShops = [
 const api_key = process.env.FETCHFOX_API_KEY;
 configure({
   apiKey: api_key,
-  host: 'https://dev.api.fetchfox.ai',
-  // host: 'https://api.fetchfox.ai',
+  // host: 'https://dev.api.fetchfox.ai',
+  host: 'https://api.fetchfox.ai',
 });
 
 // Option to use saved URLs from database if they are available. Useful to skip repeated crawls when testing.
@@ -1077,8 +1077,8 @@ Australia,AUD,1.8116,X-Rates,2025-08-20
     console.log('Items extracted:', items.length);
 
     for (const item of items) {
-      for (const copyKey of COPY_KEYS) {
-        item[copyKey] = targetData[copyKey];
+      for (const key of COPY_KEYS) {
+        item[key] = targetData[key];
       }
 
       const euros = item.euroProductPrice?.value;
