@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { crush } from 'radash'
+import { crush, shake } from 'radash'
 
 function rowsToCSV(rows) {
   const d = {};
@@ -44,11 +44,15 @@ const main = async () => {
           if (k.startsWith('_')) {
             continue;
           }
+          if (it[k] == undefined) {
+            continue;
+          }
           out[k] = it[k];
         }
         return out;
       })
-      .map(crush)
+      .map(crush);
+
     rows.push(...r);
   }
 
