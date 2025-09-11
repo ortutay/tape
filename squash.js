@@ -2,20 +2,21 @@ import fs from 'fs';
 import { crush } from 'radash'
 
 function rowsToCSV(rows) {
-  if (!rows || rows.length === 0) return '';
+  const d = {};
+  for (const row of rows) {
+    for (const k of Object.keys(row)) {
+      d[k] = true;
+    }
+  }
+  const headers = Object.keys(d);
+  console.log(headers);
 
-  // Get all headers (keys from first row)
-  const headers = Object.keys(rows[0]);
-
-  // Convert each row to CSV
   const csvRows = [
-    headers.join(','), // header row
+    headers.join(','),
     ...rows.slice(1).map(row =>
       headers.map(field => {
         let val = row[field] ?? '';
-        // Escape double quotes by doubling them
         val = String(val).replace(/"/g, '""');
-        // Wrap in quotes if contains comma, quote, or newline
         if (/[",\n]/.test(val)) {
           val = `"${val}"`;
         }
@@ -53,14 +54,6 @@ const main = async () => {
 
   console.log(rows);
 
-  const headers = {};
-  for (const row of rows) {
-    for (const k of Object.keys(row)) {
-      headers[k] = true;
-    }
-  }
-
-  console.log(headers);
   const serialized = rowsToCSV(rows);
   console.log(serialized);
 
