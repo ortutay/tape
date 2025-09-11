@@ -8,7 +8,7 @@ function rowsToCSV(rows) {
       d[k] = true;
     }
   }
-  const headers = Object.keys(d);
+  const headers = Object.keys(d).sort();
   console.log(headers);
 
   const csvRows = [
