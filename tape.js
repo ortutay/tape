@@ -14,19 +14,6 @@ try {
   // dotenv not installed, continue with process.env only
 }
 
-const workingShops = [
-  'de_hoffmann_verpackung',
-  'de_hoffmann_group',
-  'us_rs_hughes',
-  'us_uline',
-  'de_sks',
-  'de_seyffer',
-
-  // Priority shops below:
-// 'int_rs_components',
-// 'int_rubix',
-];
-
 // ============================================================================
 // FETCHFOX CONFIGURATION OPTIONS - Edit these to change behavior
 // ============================================================================
@@ -36,6 +23,7 @@ const api_key = process.env.FETCHFOX_API_KEY;
 configure({
   apiKey: api_key,
   // host: 'https://dev.api.fetchfox.ai',
+  // host: 'https://staging.api.fetchfox.ai',
   host: 'https://api.fetchfox.ai',
 });
 
@@ -93,6 +81,8 @@ const COPY_KEYS = [
 
 const SCRAPING_TARGETS = [
   {
+    working: true,
+
     ranking: '1',
     name: 'de_hoffmann_verpackung',
     dmu: 'Carl Bernh. Hoffmann GmbH & Co. KG',
@@ -112,6 +102,8 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    working: true,
+
     ranking: '2',
     name: 'de_hoffmann_group',
     dmu: 'Hoffmann GmbH',
@@ -144,6 +136,8 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    working: true,
+
     ranking: '4',
     name: 'no_norengros',
     dmu: 'NORENGROS',
@@ -158,6 +152,8 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    working: true,
+
     ranking: '5',
     name: 'us_fastenal',
     dmu: 'FASTENAL',
@@ -179,8 +175,11 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '6',
     name: 'us_kramp',
-    customer: 'Kramp',
+    dmu: 'KRAMP GROUP',
+    soldTo: 'KRAMP UK',
+
     pattern: 'https://www.kramp.com/shop-gb/en/vp/*',
     startUrls: [
       'https://www.kramp.com/shop-gb/en/c/adhesive-tape--web3-4055687?page={{1..20}}',
@@ -190,7 +189,13 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    working: true,
+
+    ranking: '7',
     name: 'de_eriks',
+    dmu: 'ERIKS',
+    soldTo: 'ERIKS INDUSTRIAL SER',
+
     customer: 'Eriks',
     pattern: 'https://shop.eriks.de/de/wartungsprodukte-klebebaender-und-zubehoer-klebebaender-abdeck-klebebaender/*/',
     startUrls: [
@@ -208,8 +213,11 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '8',
     name: 'de_tme',
-    customer: 'Transfer Multisort Elektronik',
+    dmu: 'TRANSFER MULISORT ELEKTRONIK',
+    soldTo: 'TRANSFER MULTISORT',
+
     pattern: 'https://www.tme.eu/de/details/**',
     startUrls: [
       'https://www.tme.eu/de/katalog/warn-und-markierungsbander_113787/?page={{1..20}}',
@@ -221,8 +229,11 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    ranking: '9',
     name: 'cn_ehsy',
-    customer: 'Ehsy',
+    dmu: 'Ehsy',
+    soldTo: 'Ehsy',
+
     pattern: 'https://www.ehsy.com/product-*',
     startUrls: [
       'https://www.ehsy.com/category-16688?p={{1..100}}',
@@ -232,8 +243,13 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    working: true,
+
+    ranking: '10',
     name: 'us_rs_hughes',
-    customer: 'R.S. Hughes',
+    dmu: 'RS HUGHES',
+    soldTo: 'RS HUGHES COMPANY IN',
+
     pattern: 'https://www.rshughes.com/p/**',
     startUrls: [
       'https://www.rshughes.com/c/Tapes/3002/',
@@ -256,8 +272,13 @@ const SCRAPING_TARGETS = [
   },
 
   {
+    working: true,
+
+    ranking: '11',
     name: 'us_uline',
-    customer: 'ULINE',
+    dmu: 'ULINE',
+    soldTo: 'ULINE INC',
+
     pattern: 'https://www.uline.com/Product/Detail/**',
     startUrls: [
       'https://www.uline.com/Cls_02/Tapef',
@@ -284,77 +305,13 @@ const SCRAPING_TARGETS = [
   },
 
   {
-    name: 'us_crown',
-    customer: 'Crown',
-    pattern: 'https://shop.crown.com/crown/en/**Tape**/p/**',
-    startUrls: [
-      'https://shop.crown.com/crown/en/General-Supplies/Service-Supplies/Tape-Packaging/c/tape_packaging',
-      'https://shop.crown.com/crown/en/General-Supplies/Warehouse/Floor-Tape/c/floor_tape',
-    ],
-    maxDepth: 0,
-    maxVisits: 10,
-    interact: true,
-  },
+    working: true,
 
-  {
-    name: 'us_msc',
-    customer: 'MSC',
-    pattern: 'https://www.mscdirect.com/product/details/*',
-    startUrls: [
-      'https://www.mscdirect.com/browse/Tapes-Adhesives/Tape?navid=2108684',
-    ],
-    priority: {
-      only: 'https://www.mscdirect.com/browse**',
-    },
-    proxy: 'auto',
-    maxDepth: 1,
-    maxVisits: 100,
-  },
-
-  {
-    name: 'us_motion',
-    customer: 'Motion',
-    pattern: 'https://www.motion.com/products/sku/*',
-    startUrls: [
-      'https://www.motion.com/products/Adhesives,%20Sealants%20and%20Tape/Tape',
-    ],
-    proxy: 'auto',
-    maxDepth: 0,
-    maxVisits: 10,
-    interact: true,
-  },
-
-  {
-    name: 'us_grainger',
-    customer: 'Grainger',
-    pattern: 'https://www.grainger.com/product/*',
-    startUrls: [
-      'https://www.grainger.com/category/adhesives-sealants-and-tape/tape',
-    ],
-    priority: {
-      only: [
-        'https://www.grainger.com/category/adhesives-sealants-and-tape/tape/**',
-      ]
-    },
-    maxDepth: 2,
-    maxVisits: 100,
-    proxy: 'auto',
-  },
-
-  {
-    name: 'br_neo_brasil',
-    customer: 'Neo Brasil',
-    pattern: 'https://www.lojaneobrasil.com.br/fitas-adesivas/**',
-    startUrls: [
-      'https://www.lojaneobrasil.com.br/fitas-adesivas?pg={{1..20}}',
-    ],
-    maxDepth: 0,
-    maxVisits: 100,
-  },
-
-  {
+    ranking: '12',
     name: 'de_sks',
-    customer: 'SKS',
+    dmu: 'S.K.S GmbH',
+    soldTo: 'S.K.S GmbH',
+
     pattern: 'https://www.shop-sks.com/*',
     startUrls: [
       'https://www.shop-sks.com/3M/Kleben-und-Verbinden/Einseitige-Klebebaender/?p={{0..20}}',
@@ -366,17 +323,26 @@ const SCRAPING_TARGETS = [
     ],
     contentTransform: 'slim_html',
   },
+
   {
+    ranking: '13',
     name: 'pl_semicon',
-    customer: 'Semicon',
+    dmu: 'SEMICON',
+    soldTo: 'SEMICON SP. Z O.O.',
     pattern: 'https://sklep.semicon.com.pl/shop2/,*',
     startUrls: [
       'https://sklep.semicon.com.pl/shop2/,c1481,page-{{1..10}}',
     ],
   },
+
   {
+    working: true,
+
+    ranking: '14',
     name: 'de_seyffer',
-    customer: 'Seyffer',
+    dmu: 'Seyffer GmbH',
+    soldTo: 'Seyffer GmbH',
+
     pattern: 'https://seyffer.shop/de/*.html',
     startUrls: [
       'https://seyffer.shop/de/kleben/einseitige-klebebaender/?view_mode=tiled&listing_sort=&listing_count=72&page={{0..30}}',
@@ -384,9 +350,12 @@ const SCRAPING_TARGETS = [
     ],
     contentTransform: 'slim_html',
   },
+
   {
+    ranking: '15',
     name: 'ch_ibz',
-    customer: 'IBZ',
+    dmu: 'IBZ',
+    soldTo: 'IBZ Industrie AG',
     pattern: 'https://www.ibzag.ch/*~p*',
     startUrls: [
       'https://www.ibzag.ch/de/shop/einseitig-klebende-klebebaender~c1217?page={{1..15}}',
@@ -396,8 +365,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '16',
     name: 'cz_adect',
-    customer: 'Adect',
+    dmu: 'ADECT',
+    soldTo: 'ADECT CZ spol. s r.o',
     pattern: 'https://www.adecteshop.cz/:*/',
     startUrls: [
       'https://www.adecteshop.cz/maskovaci-pasky/strana-{{1..15}}/',
@@ -405,8 +376,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '17',
     name: 'fr_manutan',
-    customer: 'Manutan',
+    dmu: 'GROUP MANUTAN',
+    soldTo: 'MANUTAN (11621)',
     pattern: 'https://www.manutan.fr/fr/maf/adhesif*',
     startUrls: [
       'https://www.manutan.fr/fr/maf/adhesif-agrafeuse-et-collage?page={{1..20}}',
@@ -418,7 +391,8 @@ const SCRAPING_TARGETS = [
   },
   {
     name: 'fr_maillaj', 
-    customer: 'Maillaj',
+    dmu: 'GROUPE ALIZON INDUSTRIE',
+    soldTo: 'MAILLAJ (GPE 12229)',
     pattern: 'https://www.maillaj.fr/fr/adhesif-colle-machine/*',
     startUrls: [
       'https://www.maillaj.fr/fr/adhesif-colle-machine?page={{1..25}}',
@@ -441,8 +415,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '18',
     name: 'fr_gd_industrie',
-    customer: 'GD Industrie',
+    dmu: 'GROUPE GD INDUSTRIE',
+    soldTo: 'GD INDUSTRIE (GPE 10',
     pattern: 'https://www.gd-industrie.com/fr/*',
     startUrls: [
       // Main adhesives category with pagination
@@ -466,8 +442,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '19',
     name: 'int_rs_components',
-    customer: 'RS Components',
+    dmu: 'RS COMPONENTS',
+    soldTo: 'RS Components GmbH',
     pattern: 'https://uk.rs-online.com/web/c/adhesives-sealants-tapes/tapes/*',
     startUrls: [
       // Main tapes category with pagination
@@ -493,8 +471,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '20',
     name: 'int_rubix',
-    customer: 'Rubix',
+    dmu: 'RUBIX',
+    soldTo: 'RUBIX',
     pattern: 'https://uk.rubix.com/en/*',
     startUrls: [
       // Main adhesive tapes category with pagination
@@ -512,8 +492,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '21',
     name: 'de_klebetechnik_und_mehr',
-    customer: 'Krückemeyer',
+    dmu: 'Krückemeyer',
+    soldTo: 'Krückemeyer',
     pattern: 'https://www.klebetechnik-und-mehr.de/epages/63672978.sf/de_DE/*',
     startUrls: [
       // Main adhesive tapes category with pagination
@@ -521,8 +503,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '22',
     name: 'de_kahmann_ellerbrock',
-    customer: 'Kahmann & Ellerbrock',
+    dmu: 'Kahmann & Ellerbrock',
+    soldTo: 'Kahmann & Ellerbrock',
     pattern: 'https://www.ke.de/*',
     startUrls: [
       // Main adhesive tapes category with pagination
@@ -530,8 +514,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '23',
     name: 'at_kaindl',
-    customer: 'KAINDL',
+    dmu: 'Kaindl-Technischer Industriebedarf',
+    soldTo: 'Kaindl-Technischer I',
     pattern: 'https://webshop.kaindltech.at/shop/de/*',
     startUrls: [
       // Main category and subcategories
@@ -547,8 +533,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '24',
     name: 'de_moosmann',
-    customer: 'Moosmann',
+    dmu: 'Moosmann GmbH & Co. KG',
+    soldTo: 'Moosmann GmbH & Co.',
     pattern: 'https://www.moosmann.de/*',
     startUrls: [
       // Main category and subcategories
@@ -566,8 +554,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '25',
     name: 'de_mueth_tapes',
-    customer: 'Müth Tapes',
+    dmu: 'müth tapes GmbH & Co.KG',
+    soldTo: 'mÃ¼th tapes GmbH & Co',
     pattern: 'https://shop.mueth.de/*',
     startUrls: [
       // Main category and subcategories
@@ -586,8 +576,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '26',
     name: 'de_selmundo',
-    customer: 'Selmundo',
+    dmu: 'OM-Klebetechnik GmbH',
+    soldTo: 'OM-Klebetechnik GmbH',
     pattern: 'https://www.selmundo.com/:*',
     visitPriority: {
       only: [
@@ -629,8 +621,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '27',
     name: 'de_roeckelein',
-    customer: 'Röckelein',
+    dmu: 'Röckelein GmbH',
+    soldTo: 'RÃ¶ckelein GmbH',
     pattern: 'https://roeckelein-gmbh.de/*',
     startUrls: [
       // Single-sided tapes main category and subcategories
@@ -669,8 +663,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '28',
     name: 'uk_austen_direct',
-    customer: 'Austen Tapes',
+    dmu: 'AUSTEN INSTANT TAPES LTD',
+    soldTo: 'AUSTEN INSTANT TAPES',
     pattern: 'https://austendirect.co.uk/*',
     startUrls: [
       // All subcategories
@@ -690,8 +686,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '29',
     name: 'se_ahlsell',
-    customer: 'Ahlsell',
+    dmu: 'AHLSELL',
+    soldTo: 'AHLSELL (DIREKTLEV.)',
     pattern: 'https://www.ahlsell.se/*',
     startUrls: [
       // Main category
@@ -699,8 +697,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '30',
     name: 'cz_aztech',
-    customer: 'Aztech',
+    dmu: 'AZ TECH',
+    soldTo: 'AZ TECH, s.r.o.',
     pattern: 'https://eshop.aztech.cz/*',
     startUrls: [
       // Main category
@@ -708,8 +708,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '31',
     name: 'cz_dr_tapes',
-    customer: 'Dr. Tapes',
+    dmu: 'B.M.P.',
+    soldTo: 'B.M.P. S.R.L.',
     pattern: 'https://drtapes.com/it/*',
     startUrls: [
       // Main categories
@@ -718,8 +720,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '32',
     name: 'it_tapes_store',
-    customer: 'Biemme Adesivi',
+    dmu: 'BIEMME ADESIVI SRL',
+    soldTo: 'BIEMME ADESIVI SRL',
     pattern: 'https://www.tapes-store.com/it/*',
     startUrls: [
       // Main categories
@@ -728,8 +732,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '33',
     name: 'se_boxon',
-    customer: 'Boxon',
+    dmu: 'BOXON',
+    soldTo: 'BOXON A/S',
     pattern: 'https://www.boxon.se/*',
     startUrls: [
       // Main category
@@ -737,8 +743,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '34',
     name: 'uk_castletis',
-    customer: 'Castle Tapes',
+    dmu: 'CASTLE TAPES & INDUSTRIAL SOLUTIONS',
+    soldTo: 'CASTLE TAPES & INDUS',
     pattern: 'https://castletis.co.uk/*',
     startUrls: [
       // Main category
@@ -746,8 +754,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '35',
     name: 'it_dpm',
-    customer: 'Dipiemme',
+    dmu: 'DIPIEMME S.R.L.',
+    soldTo: 'DIPIEMME S.R.L.',
     pattern: 'https://dpmtapes.com/*',
     startUrls: [
       // Main categories
@@ -757,8 +767,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '36',
     name: 'de_hahn_kolb',
-    customer: 'Hahn + Kolb',
+    dmu: 'Würth',
+    soldTo: 'HAHN + KOLB Werkzeug',
     pattern: 'https://www.hahn-kolb.de/*',
     startUrls: [
       // Main category
@@ -766,8 +778,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '37',
     name: 'at_hostra',
-    customer: 'Hostra',
+    dmu: 'Hostra',
+    soldTo: 'Hostra Gummi- und Ku',
     pattern: 'https://shop.hostra.at/*',
     startUrls: [
       // Main category
@@ -775,8 +789,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '38',
     name: 'it_firenze',
-    customer: 'Nuova Firenze',
+    dmu: 'NUOVA FIRENZE NASTRI',
+    soldTo: 'NUOVA FIRENZE NASTRI',
     pattern: 'https://www.firenzenastri.it/it/*',
     startUrls: [
       // Main category
@@ -784,8 +800,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '39',
     name: 'ro_papyrus',
-    customer: 'Papyrus',
+    dmu: 'PAPYRUS',
+    soldTo: 'PAPYRUS ROMANIA SRL',
     pattern: 'https://www.papyrus.com/roRO/*',
     startUrls: [
       // Main category
@@ -793,8 +811,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '40',
     name: 'uk_shandhigson',
-    customer: 'Shand Higson',
+    dmu: 'SHAND HIGSON & CO LTD',
+    soldTo: 'SHAND HIGSON & CO. L',
     pattern: 'https://www.shandhigson.co.uk/*',
     startUrls: [
       // Main category
@@ -802,8 +822,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '41',
     name: 'es_solbi_mural',
-    customer: 'Solbi Mural',
+    dmu: 'SOLBI MURAL',
+    soldTo: 'SOLBI MURAL,S.L.',
     pattern: 'https://solbi-mural.com/en/*',
     startUrls: [
       // Main categories
@@ -812,8 +834,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '42',
     name: 'hr_tahea',
-    customer: 'Tahea',
+    dmu: 'Tahea csoport',
+    soldTo: 'TAHEA d.o.o.Poduzece',
     pattern: 'https://www.spooling.hr/product-page/*',
     startUrls: [
       // Main category
@@ -821,8 +845,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '43',
     name: 'no_tess',
-    customer: 'Tess',
+    dmu: 'TESS',
+    soldTo: 'TESS Ã˜ST AS',
     pattern: 'https://www.tess.no/*',
     startUrls: [
       // Main category
@@ -830,8 +856,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '44',
     name: 'it_tapes_point',
-    customer: 'Tapes Point',
+    dmu: 'THE-MA',
+    soldTo: 'THE-MA SPA',
     pattern: 'https://tapespoint.com/en/*',
     startUrls: [
       // Main categories
@@ -841,8 +869,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '45',
     name: 'se_swedol',
-    customer: 'Swedol',
+    dmu: 'TOOLS',
+    soldTo: 'SWEDOL AB',
     pattern: 'https://www.swedol.se/*',
     startUrls: [
       // Main category
@@ -850,8 +880,10 @@ const SCRAPING_TARGETS = [
     ],
   },
   {
+    ranking: '46',
     name: 'es_trayma',
-    customer: 'Trayma',
+    dmu: 'TRANSFORMADOS Y MANIPULADOS',
+    soldTo: 'TRANSFORMADOS Y MANI',
     pattern: 'https://www.trayma.es/*',
     startUrls: [
       // Main categories
@@ -859,8 +891,1245 @@ const SCRAPING_TARGETS = [
       'https://www.trayma.es/cinta-adhesiva-doble-cara/',
       'https://www.trayma.es/espumas-epdm-pvc-adhesivo/',
     ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '47',
+    name: 'cn_zkh',
+    dmu: 'ZKH',
+    soldTo: 'ZKH',
+    website: 'https://www.zkh.com',
+    pattern: '',
+    mainCategory: 'https://www.zkh.com/list/c-10283311.html?showType=pic&clp=1',
+    subCategories: [],
+    startUrls: [
+      'https://www.zkh.com/list/c-10283311.html?showType=pic&clp=1'
+    ],
+    info: 'check language, load more functionality, create pattern',
+    status: 'inactive',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '48',
+    name: 'cn_jd',
+    dmu: 'JD',
+    soldTo: 'JD',
+    website: 'https://www.jd.com',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [
+      ''
+    ],
+    info: 'cant access, tried many vpns',
+    status: 'blocked',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '49',
+    name: 'us_addev',
+    dmu: 'ADDEV',
+    soldTo: 'DICKSON HOLLAND B.V.',
+    website: 'https://shop.aero.addevmaterials.us',
+    pattern: 'https://shop.aero.addevmaterials.us/product/*',
+    mainCategory: 'https://shop.aero.addevmaterials.us/product-category/tapes/?products-per-page=all',
+    subCategories: [],
+    startUrls: [
+      'https://shop.aero.addevmaterials.us/product-category/tapes/?products-per-page=all'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '50',
+    name: 'us_crown',
+    dmu: 'Crown',
+    soldTo: 'Crown',
+
+    pattern: 'https://shop.crown.com/crown/en/**Tape**/p/**',
+    startUrls: [
+      'https://shop.crown.com/crown/en/General-Supplies/Service-Supplies/Tape-Packaging/c/tape_packaging',
+      'https://shop.crown.com/crown/en/General-Supplies/Warehouse/Floor-Tape/c/floor_tape',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+    interact: true,
+
+    website: 'https://shop.crown.com',
+    mainCategory: 'https://shop.crown.com/crown/en/General-Supplies/Service-Supplies/Tape-Packaging/c/tape_packaging',
+    subCategories: [],
+    info: '2 main categories, different patterns -> how to implement?',
+  },
+  {
+    ranking: '51',
+    name: 'us_piedmont',
+    dmu: 'Piedmont National',
+    soldTo: 'Piedmont National',
+    website: 'https://piedmontnational.com',
+    pattern: 'https://piedmontnational.com/product/*',
+    mainCategory: 'https://piedmontnational.com/packaging-materials-supplies/tapes-adhesives/',
+    subCategories: [],
+    startUrls: [
+      'https://piedmontnational.com/packaging-materials-supplies/tapes-adhesives/'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '52',
+    name: 'us_bgr',
+    dmu: 'BGR',
+    soldTo: 'BGR',
+    website: 'https://store.packbgr.com',
+    pattern: '',
+    mainCategory: 'https://store.packbgr.com/packaging/tape.asp',
+    skipSubCategories: [
+      'https://store.packbgr.com/tape/office-and-stationery-tape.asp'
+    ],
+    subCategories: [],
+    startUrls: [
+      'https://store.packbgr.com/packaging/tape.asp'
+    ],
+    info: 'do all sub categories EXCEPT the ones I listed to skip',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '53',
+    name: 'us_msc',
+    dmu: 'MSC',
+    soldTo: 'MSC',
+    website: 'https://www.mscdirect.com',
+    pattern: 'https://www.mscdirect.com/product/*',
+    mainCategory: 'https://www.mscdirect.com/browse/Tapes-Adhesives/Tape?navid=2108684',
+    subCategories: [],
+    startUrls: [
+      'https://www.mscdirect.com/browse/Tapes-Adhesives/Tape?navid=2108684'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '54',
+    name: 'us_motion',
+    dmu: 'Motion',
+    soldTo: 'Motion',
+    website: 'https://www.motion.com',
+    pattern: 'https://www.motion.com/products/sku/*',
+    mainCategory: 'https://www.motion.com/products/Adhesives,%20Sealants%20and%20Tape/Tape',
+    subCategories: [],
+    startUrls: [
+      'https://www.motion.com/products/Adhesives,%20Sealants%20and%20Tape/Tape'
+    ],
+    info: 'vpn from us needed',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '55',
+    name: 'us_grainger',
+    dmu: 'Grainger',
+    soldTo: 'Grainger',
+    website: 'https://www.grainger.com',
+    pattern: '',
+    mainCategory: 'https://www.grainger.com/category/adhesives-sealants-and-tape/tape',
+    subCategories: [],
+    startUrls: [
+      'https://www.grainger.com/category/adhesives-sealants-and-tape/tape'
+    ],
+    info: 'many categories with complete different pattern -> how to do?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '56',
+    name: 'br_neo_brasil',
+    dmu: 'NEO BRAS IND E COM D',
+    soldTo: 'NEO BRAS IND E COM D',
+    website: 'https://www.lojaneobrasil.com.br',
+    pattern: 'https://www.lojaneobrasil.com.br/fitas-adesivas/*',
+    mainCategory: 'https://www.lojaneobrasil.com.br/fitas-adesivas',
+    subCategories: [],
+    startUrls: [
+      'https://www.lojaneobrasil.com.br/fitas-adesivas'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '57',
+    name: 'br_so_fitas',
+    dmu: 'SO FITAS IND, COM E',
+    soldTo: 'SO FITAS IND, COM E',
+    website: 'https://www.sofitas.com.br',
+    pattern: 'https://www.sofitas.com.br/*',
+    mainCategory: 'https://www.sofitas.com.br/vhb-automotivo',
+    subCategories: [],
+    startUrls: [
+      'https://www.sofitas.com.br/vhb-automotivo'
+    ],
+    info: 'many main categories, setup?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '58',
+    name: 'br_atm',
+    dmu: 'ATM REPRESENTACOES C',
+    soldTo: 'ATM REPRESENTACOES C',
+    website: 'https://www.atmdistribuicao.com.br',
+    pattern: 'https://www.atmdistribuicao.com.br/*',
+    mainCategory: 'https://www.atmdistribuicao.com.br/fitas',
+    subCategories: [],
+    startUrls: [
+      'https://www.atmdistribuicao.com.br/fitas'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '59',
+    name: 'cr_afalpi',
+    dmu: 'Afalpi S.A.',
+    soldTo: 'Afalpi S.A.',
+    website: 'https://www.afalpi.com',
+    pattern: 'https://www.afalpi.com/products/*',
+    mainCategory: 'https://www.afalpi.com/categories/12553/cintas-adhesivas-industriales',
+    subCategories: [],
+    startUrls: [
+      'https://www.afalpi.com/categories/12553/cintas-adhesivas-industriales'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '60',
+    name: 'cl_santiago_hermanos',
+    dmu: 'SANTIAGO HERMANOS LT',
+    soldTo: 'SANTIAGO HERMANOS LT',
+    website: 'https://www.tiendamicrogeo.cl',
+    pattern: 'https://www.tiendamicrogeo.cl/collections/cintas-adhesivas/products/*',
+    mainCategory: 'https://www.tiendamicrogeo.cl/collections/cintas-adhesivas',
+    subCategories: [],
+    startUrls: [
+      'https://www.tiendamicrogeo.cl/collections/cintas-adhesivas'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '61',
+    name: 'au_ata',
+    dmu: 'A.T.A. DISTRIBUTORS PTY.LTD.',
+    soldTo: 'A.T.A. DISTRIBUTORS',
+    website: 'https://www.atadist.com.au',
+    pattern: 'https://www.atadist.com.au/*',
+    mainCategory: 'https://www.atadist.com.au/Adhesive-Tape/pl.php',
+    skipSubCategories: [
+      'https://www.atadist.com.au/Adhesive-Tape/Wipes/pl.php'
+    ],
+    subCategories: [],
+    startUrls: [
+      'https://www.atadist.com.au/Adhesive-Tape/pl.php'
+    ],
+    info: 'crawl all main categories but skip the ones I mentioned',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '62',
+    name: 'au_adelaide_packaging',
+    dmu: 'ADELAIDE PACKAGING SUPP. P/L',
+    soldTo: 'United Office Suppli',
+    website: 'https://www.adpack.com.au',
+    pattern: '',
+    mainCategory: 'https://www.adpack.com.au/category/104-tapes-and-adhesives',
+    skipSubCategories: [
+      'https://www.adpack.com.au/category/127-tape-dispensers'
+    ],
+    subCategories: [],
+    startUrls: [
+      'https://www.adpack.com.au/category/104-tapes-and-adhesives'
+    ],
+    info: 'crawl all main categories but skip the ones I mentioned',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '63',
+    name: 'nz_attwoods',
+    dmu: 'ATTWOOD PACKAGING LTD',
+    soldTo: 'ATTWOOD PACKAGING LT',
+    website: 'https://www.attwoods.co.nz',
+    pattern: '',
+    mainCategory: 'https://www.attwoods.co.nz/Product-Range/TA/FO',
+    subCategories: [],
+    startUrls: [
+      'https://www.attwoods.co.nz/Product-Range/TA/FO'
+    ],
+    info: 'many main categories, setup?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '64',
+    name: 'ko_coretech',
+    dmu: 'CORETECH',
+    soldTo: 'CORETECH',
+    website: 'https://ctshop.co.kr',
+    pattern: '',
+    mainCategory: 'https://ctshop.co.kr/product/list.html?cate_no=23',
+    subCategories: [],
+    startUrls: [
+      'https://ctshop.co.kr/product/list.html?cate_no=23'
+    ],
+    info: 'help with pattern, korean page',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '65',
+    name: 'au_ets',
+    dmu: 'EMBOSSING & TAPE SUPPLIES P/L',
+    soldTo: 'EMBOSSING & TAPE SUP',
+    website: 'https://embossingtapesupplies.com.au',
+    pattern: '',
+    mainCategory: 'https://embossingtapesupplies.com.au/order-tape-online.html?product_list_limit=36',
+    subCategories: [],
+    startUrls: [
+      'https://embossingtapesupplies.com.au/order-tape-online.html?product_list_limit=36'
+    ],
+    info: 'this entire shop is a nightmare in terms of getting all tapes, too many weird categories, need better solution',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '66',
+    name: 'au_irs',
+    dmu: 'INDUSTRIAL RUBBER SUPPLIES P/L',
+    soldTo: 'INDUSTRIAL RUBBER SU',
+    website: 'https://www.indrub.com.au',
+    pattern: 'https://www.indrub.com.au/*',
+    mainCategory: 'https://www.indrub.com.au/tapes.html',
+    subCategories: [],
+    startUrls: [
+      'https://www.indrub.com.au/tapes.html'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '67',
+    name: 'jp_logical_eye',
+    dmu: 'LOGICAL EYE',
+    soldTo: 'LOGICAL EYE',
+    website: 'https://logicaleye-shop.com',
+    pattern: '',
+    mainCategory: 'https://logicaleye-shop.com/?mode=grp&gid=2487800',
+    subCategories: [],
+    startUrls: [
+      'https://logicaleye-shop.com/?mode=grp&gid=2487800'
+    ],
+    info: 'need to check language',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '68',
+    name: 'au_mws',
+    dmu: 'MACARTHUR WRAP AND STRAP',
+    soldTo: 'MACARTHUR WRAP AND S',
+    website: 'https://www.macwrapstrap.com.au',
+    pattern: 'https://www.macwrapstrap.com.au/product/*',
+    mainCategory: 'https://www.macwrapstrap.com.au/category/tapes/',
+    subCategories: [],
+    startUrls: [
+      'https://www.macwrapstrap.com.au/category/tapes/'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '69',
+    name: 'au_total_tools',
+    dmu: 'Total Tools',
+    soldTo: 'Total Tools',
+    website: 'https://www.totaltools.com.au',
+    pattern: 'https://www.totaltools.com.au/construction-tools/glues-sealants/*',
+    mainCategory: 'https://www.totaltools.com.au/construction-tools/glues-sealants/tapes?product_list_limit=48',
+    subCategories: [],
+    startUrls: [
+      'https://www.totaltools.com.au/construction-tools/glues-sealants/tapes?product_list_limit=48'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '70',
+    name: 'at_sonepar',
+    dmu: 'Sonepar',
+    soldTo: 'Sonepar',
+    website: 'https://shop.sonepar.at',
+    pattern: 'https://shop.sonepar.at/article/*',
+    mainCategory: 'https://shop.sonepar.at/search?c=1235',
+    subCategories: [],
+    startUrls: [
+      'https://shop.sonepar.at/search?c=1235'
+    ],
+    info: 'no prices',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '71',
+    name: 'de_rexel',
+    dmu: 'Rexel',
+    soldTo: 'Rexel',
+    website: 'https://www.rexel.de',
+    pattern: 'https://www.rexel.de/Kategorien/Installation/Anschliessen-%26-Verbinden/Klebeband/*',
+    mainCategory: 'https://www.rexel.de/Kategorien/Installation/Anschliessen-%26-Verbinden/Klebeband/c/EC000128',
+    subCategories: [],
+    startUrls: [
+      'https://www.rexel.de/Kategorien/Installation/Anschliessen-%26-Verbinden/Klebeband/c/EC000128'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '72',
+    name: 'uk_cromwell',
+    dmu: 'Cromwell',
+    soldTo: 'Cromwell',
+    website: 'https://www.cromwell.co.uk',
+    pattern: 'https://www.cromwell.co.uk/shop/adhesives-and-sealants/*',
+    mainCategory: 'https://www.cromwell.co.uk/shop/adhesives-and-sealants/adhesive-tapes/c/0401',
+    subCategories: [],
+    startUrls: [
+      'https://www.cromwell.co.uk/shop/adhesives-and-sealants/adhesive-tapes/c/0401'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '73',
+    name: 'de_farnell',
+    dmu: 'Farnell',
+    soldTo: 'Farnell',
+    website: 'https://de.farnell.com',
+    pattern: 'https://de.farnell.com/*',
+    mainCategory: 'https://de.farnell.com/c/werkzeuge-werkstattbedarf/klebebander/prl/ergebnisse',
+    subCategories: [],
+    startUrls: [
+      'https://de.farnell.com/c/werkzeuge-werkstattbedarf/klebebander/prl/ergebnisse'
+    ],
+    info: 'pattern needs final check',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '74',
+    name: 'uk_ferguson',
+    dmu: 'Ferguson',
+    soldTo: 'Ferguson',
+    website: 'https://www.ferguson.com',
+    pattern: 'https://www.ferguson.com/product/*',
+    mainCategory: 'https://www.ferguson.com/category/adhesives-sealants/tapes/',
+    subCategories: [],
+    startUrls: [
+      'https://www.ferguson.com/category/adhesives-sealants/tapes/'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '75',
+    name: 'de_bodo_moeller',
+    dmu: 'Bodo Möller Chemie',
+    soldTo: 'Bodo Möller Chemie',
+    website: 'https://shop.bm-chemie.com',
+    pattern: 'https://shop.bm-chemie.com/de/de/*',
+    mainCategory: 'https://shop.bm-chemie.com/de/de/klebstoffe/doppelseitige-klebebander.html',
+    subCategories: [],
+    startUrls: [
+      'https://shop.bm-chemie.com/de/de/klebstoffe/doppelseitige-klebebander.html'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '76',
+    name: 'de_wuerth',
+    dmu: 'Würth',
+    soldTo: 'Würth',
+    website: 'https://eshop.wuerth.de',
+    pattern: '',
+    mainCategory: 'https://eshop.wuerth.de/Produktkategorien/Klebebaender/14013004.cyid/1401.cgid/de/DE/EUR/',
+    skipSubCategories: [
+      'https://eshop.wuerth.de/Produktkategorien/Klebe-Isolier-Dichtbaender-Zubehoer/1401300407.cyid/1401.cgid/de/DE/EUR/'
+    ],
+    subCategories: [],
+    startUrls: [
+      'https://eshop.wuerth.de/Produktkategorien/Klebebaender/14013004.cyid/1401.cgid/de/DE/EUR/'
+    ],
+    info: 'skip sub categories',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '77',
+    name: 'us_airgas',
+    dmu: 'Airgas Inc.',
+    soldTo: 'Airgas Inc.',
+    website: 'https://www.airgas.com',
+    pattern: 'https://www.airgas.com/product/Tools-and-Hardware/MRO-%26-Plant-Maintenance/Industrial-Tape/p/*',
+    mainCategory: 'https://www.airgas.com/Tools-and-Hardware/MRO-%26-Plant-Maintenance/Industrial-Tape/category/291',
+    subCategories: [],
+    startUrls: [
+      'https://www.airgas.com/Tools-and-Hardware/MRO-%26-Plant-Maintenance/Industrial-Tape/category/291'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '78',
+    name: 'be_dexis',
+    dmu: 'GROUPE DESCOURS & CABAUD',
+    soldTo: 'DEXIS BOUTILLON SENS',
+    website: 'https://www.dexis.be',
+    pattern: 'https://www.dexis.be/*',
+    mainCategory: 'https://www.dexis.be/Parts-Products/Technische-producten/Lijmen-en-kleefband/Kleefband-en-folie/KLEEFBAND/',
+    subCategories: [],
+    startUrls: [
+      'https://www.dexis.be/Parts-Products/Technische-producten/Lijmen-en-kleefband/Kleefband-en-folie/KLEEFBAND/'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '79',
+    name: 'es_prolians',
+    dmu: 'PROLIANS',
+    soldTo: 'METALCO',
+    website: 'https://prolians.es',
+    pattern: 'https://prolians.es/clientes/empresa*',
+    mainCategory: 'https://prolians.es/clientes/empresa/shop.php?cat=10&sub=2&sub2=50&sub3=0&sub4=0&sub5=0&grupo=1',
+    subCategories: [],
+    startUrls: [
+      'https://prolians.es/clientes/empresa/shop.php?cat=10&sub=2&sub2=50&sub3=0&sub4=0&sub5=0&grupo=1'
+    ],
+    info: 'has no real product detail pages, no prices, "closed" shop',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '80',
+    name: 'be_cebeo',
+    dmu: 'Cebeo',
+    soldTo: 'Cebeo',
+    website: 'https://www.cebeo.be',
+    pattern: 'https://www.cebeo.be/catalog/nl-be/products/*',
+    mainCategory: 'https://www.cebeo.be/catalog/nl-be/category/tapes-14369',
+    subCategories: [],
+    startUrls: [
+      'https://www.cebeo.be/catalog/nl-be/category/tapes-14369'
+    ],
+    info: 'no prices, "closed" shop',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '81',
+    name: 'fr_mabeo',
+    dmu: 'Mabeo Industries',
+    soldTo: 'Mabeo Industries',
+    website: 'https://www.mabeo-industries.com',
+    pattern: 'https://www.mabeo-industries.com/*',
+    mainCategory: 'https://www.mabeo-industries.com/C-150770-adhesif/I-Page1_40',
+    subCategories: [],
+    startUrls: [
+      'https://www.mabeo-industries.com/C-150770-adhesif/I-Page1_40'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '82',
+    name: 'fr_legallais',
+    dmu: 'GROUPE LEGALLAIS',
+    soldTo: 'LEGALLAIS',
+    website: 'https://www.legallais.com',
+    pattern: '',
+    mainCategory: 'https://www.legallais.com/adhesifs-demballage/985',
+    subCategories: [],
+    startUrls: [
+      'https://www.legallais.com/adhesifs-demballage/985'
+    ],
+    info: 'many main categories, setup?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '83',
+    name: 'us_budnick',
+    dmu: 'Budnick',
+    soldTo: 'Budnick',
+    website: 'https://budnick.com',
+    pattern: '',
+    mainCategory: 'https://budnick.com/products/advanced-search?wp=6&thmin=0&thmax=781&tmin=-40&tmax=752&tsmin=0&tsmax=4400',
+    subCategories: [],
+    startUrls: [
+      'https://budnick.com/products/advanced-search?wp=6&thmin=0&thmax=781&tmin=-40&tmax=752&tsmin=0&tsmax=4400'
+    ],
+    info: 'only main categories, no product detail pages, setup for pattern?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '84',
+    name: 'de_armpack',
+    dmu: 'Armpack',
+    soldTo: 'Armpack',
+    website: 'https://www.armpack.de',
+    pattern: 'https://www.armpack.de/klebebaender/*',
+    mainCategory: 'https://www.armpack.de/klebebaender/',
+    subCategories: [],
+    startUrls: [
+      'https://www.armpack.de/klebebaender/'
+    ],
+    info: 'German packaging supplier with tape section',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '85',
+    name: 'nl_tape_jungle',
+    dmu: 'Tape Jungle',
+    soldTo: 'Tape Jungle',
+    website: 'https://www.tapejungle.nl',
+    pattern: 'https://www.tapejungle.nl/product/*',
+    mainCategory: 'https://www.tapejungle.nl/tape/',
+    subCategories: [],
+    startUrls: [
+      'https://www.tapejungle.nl/tape/'
+    ],
+    info: 'Dutch tape specialist',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '86',
+    name: 'de_pack4food24',
+    dmu: 'Pack4Food24',
+    soldTo: 'Pack4Food24',
+    website: 'https://www.pack4food24.de',
+    pattern: 'https://www.pack4food24.de/*',
+    mainCategory: 'https://www.pack4food24.de/klebebaender/',
+    subCategories: [],
+    startUrls: [
+      'https://www.pack4food24.de/klebebaender/'
+    ],
+    info: 'Food packaging specialist with tape section',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '87',
+    name: 'de_viking',
+    dmu: 'Viking',
+    soldTo: 'Viking',
+    website: 'https://www.viking.de',
+    pattern: 'https://www.viking.de/de/p/*',
+    mainCategory: 'https://www.viking.de/de/c/klebebaender',
+    subCategories: [],
+    startUrls: [
+      'https://www.viking.de/de/c/klebebaender'
+    ],
+    info: 'Office supplies with tape section',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '88',
+    name: 'fr_raja',
+    dmu: 'RAJA',
+    soldTo: 'RAJA',
+    website: 'https://www.raja.fr',
+    pattern: 'https://www.raja.fr/*',
+    mainCategory: 'https://www.raja.fr/emballage/adhesifs-et-rubans',
+    subCategories: [],
+    startUrls: [
+      'https://www.raja.fr/emballage/adhesifs-et-rubans'
+    ],
+    info: 'French packaging specialist',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '89',
+    name: 'uk_raja',
+    dmu: 'RAJA UK',
+    soldTo: 'RAJA UK',
+    website: 'https://www.raja.co.uk',
+    pattern: 'https://www.raja.co.uk/*',
+    mainCategory: 'https://www.raja.co.uk/packaging/tapes-adhesives',
+    subCategories: [],
+    startUrls: [
+      'https://www.raja.co.uk/packaging/tapes-adhesives'
+    ],
+    info: 'UK branch of RAJA packaging',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '90',
+    name: 'es_raja',
+    dmu: 'RAJA España',
+    soldTo: 'RAJA España',
+    website: 'https://www.raja.es',
+    pattern: 'https://www.raja.es/*',
+    mainCategory: 'https://www.raja.es/embalaje/cintas-adhesivas',
+    subCategories: [],
+    startUrls: [
+      'https://www.raja.es/embalaje/cintas-adhesivas'
+    ],
+    info: 'Spanish branch of RAJA packaging',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '91',
+    name: 'it_raja',
+    dmu: 'RAJA Italia',
+    soldTo: 'RAJA Italia',
+    website: 'https://www.raja.it',
+    pattern: 'https://www.raja.it/*',
+    mainCategory: 'https://www.raja.it/imballaggio/nastri-adesivi',
+    subCategories: [],
+    startUrls: [
+      'https://www.raja.it/imballaggio/nastri-adesivi'
+    ],
+    info: 'Italian branch of RAJA packaging',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '92',
+    name: 'de_ratioform',
+    dmu: 'ratioform',
+    soldTo: 'ratioform',
+    website: 'https://www.ratioform.de',
+    pattern: 'https://www.ratioform.de/shop/*',
+    mainCategory: 'https://www.ratioform.de/shop/klebebaender/',
+    subCategories: [],
+    startUrls: [
+      'https://www.ratioform.de/shop/klebebaender/'
+    ],
+    info: 'German packaging specialist',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '93',
+    name: 'nl_ratioform',
+    dmu: 'ratioform Nederland',
+    soldTo: 'ratioform Nederland',
+    website: 'https://www.ratioform.nl',
+    pattern: 'https://www.ratioform.nl/shop/*',
+    mainCategory: 'https://www.ratioform.nl/shop/tape/',
+    subCategories: [],
+    startUrls: [
+      'https://www.ratioform.nl/shop/tape/'
+    ],
+    info: 'Dutch branch of ratioform',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '94',
+    name: 'be_ratioform',
+    dmu: 'ratioform België',
+    soldTo: 'ratioform België',
+    website: 'https://www.ratioform.be',
+    pattern: 'https://www.ratioform.be/shop/*',
+    mainCategory: 'https://www.ratioform.be/shop/tape/',
+    subCategories: [],
+    startUrls: [
+      'https://www.ratioform.be/shop/tape/'
+    ],
+    info: 'Belgian branch of ratioform',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '95',
+    name: 'us_packaging_corporation',
+    dmu: 'Packaging Corporation',
+    soldTo: 'Packaging Corporation',
+    website: 'https://www.packagingcorp.com',
+    pattern: 'https://www.packagingcorp.com/product/*',
+    mainCategory: 'https://www.packagingcorp.com/packaging-tape/',
+    subCategories: [],
+    startUrls: [
+      'https://www.packagingcorp.com/packaging-tape/'
+    ],
+    info: 'US packaging supplier',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '96',
+    name: 'ca_uline',
+    dmu: 'Uline Canada',
+    soldTo: 'Uline Canada',
+    website: 'https://www.uline.ca',
+    pattern: 'https://www.uline.ca/Product/Detail/*',
+    mainCategory: 'https://www.uline.ca/Grp_90/Tape',
+    subCategories: [],
+    startUrls: [
+      'https://www.uline.ca/Grp_90/Tape'
+    ],
+    info: 'Canadian branch of Uline',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '97',
+    name: 'mx_uline',
+    dmu: 'Uline Mexico',
+    soldTo: 'Uline Mexico',
+    website: 'https://www.uline.mx',
+    pattern: 'https://www.uline.mx/Product/Detail/*',
+    mainCategory: 'https://www.uline.mx/Grp_90/Cinta-Adhesiva',
+    subCategories: [],
+    startUrls: [
+      'https://www.uline.mx/Grp_90/Cinta-Adhesiva'
+    ],
+    info: 'Mexican branch of Uline',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '98',
+    name: 'marketplace_digikey',
+    dmu: 'DigiKey',
+    soldTo: 'DigiKey',
+    website: 'https://www.digikey.com',
+    pattern: '',
+    mainCategory: 'https://www.digikey.com/en/products/filter/tape/908?s=N4IgTCBcDaIMwFsAEA3AFgIxAXQL5A',
+    subCategories: [],
+    startUrls: [
+      'https://www.digikey.com/en/products/filter/tape/908?s=N4IgTCBcDaIMwFsAEA3AFgIxAXQL5A'
+    ],
+    info: 'will probably require residential proxies',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '99',
+    name: 'marketplace_mercado_livre',
+    dmu: 'Mercado Livre',
+    soldTo: 'Mercado Livre',
+    website: 'https://lista.mercadolivre.com.br',
+    pattern: '',
+    mainCategory: 'https://lista.mercadolivre.com.br/arte-papelaria-armarinho/materiais-escolares/comercial-organizacao/adesivos-corte/fitas-adesivas/',
+    subCategories: [],
+    startUrls: [
+      'https://lista.mercadolivre.com.br/arte-papelaria-armarinho/materiais-escolares/comercial-organizacao/adesivos-corte/fitas-adesivas/'
+    ],
+    info: 'need assistance here, you get blocked every x-pages (error 429), seems they have over +30k tape listings???',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '100',
+    name: 'br_mipe',
+    dmu: 'MIPE Supply',
+    soldTo: 'MIPE Supply',
+    website: 'https://mipesupply.com.br',
+    pattern: 'https://mipesupply.com.br/loja/*',
+    mainCategory: 'https://mipesupply.com.br/categoria-produto/linhas-de-produtos/fitas-e-adesivos/',
+    subCategories: [],
+    startUrls: [
+      'https://mipesupply.com.br/categoria-produto/linhas-de-produtos/fitas-e-adesivos/'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '101',
+    name: 'co_sumatec',
+    dmu: 'Sumatec',
+    soldTo: 'Sumatec',
+    website: 'https://www.sumatec.co',
+    pattern: 'https://www.sumatec.co/*',
+    mainCategory: 'https://www.sumatec.co/productos/ferreteria-y-accesorios-mro/cintas',
+    subCategories: [],
+    startUrls: [
+      'https://www.sumatec.co/productos/ferreteria-y-accesorios-mro/cintas'
+    ],
+    info: 'needs proxy',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '102',
+    name: 'br_anhanguera_ferramentas',
+    dmu: 'Anhanguera Ferramentas',
+    soldTo: 'Anhanguera Ferramentas',
+    website: 'https://www.anhangueraferramentas.com.br',
+    pattern: 'https://www.anhangueraferramentas.com.br/*',
+    mainCategory: 'https://www.anhangueraferramentas.com.br/colas-adesivos-e-lubrificantes/fita-adesiva',
+    subCategories: [],
+    startUrls: [
+      'https://www.anhangueraferramentas.com.br/colas-adesivos-e-lubrificantes/fita-adesiva'
+    ],
+    info: 'many main categories, setup?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '103',
+    name: 'br_dimensional',
+    dmu: 'Dimensional',
+    soldTo: 'Dimensional',
+    website: 'https://www.dimensional.com.br',
+    pattern: 'https://www.dimensional.com.br/*',
+    mainCategory: 'https://www.dimensional.com.br/material-eletrico/fita',
+    subCategories: [],
+    startUrls: [
+      'https://www.dimensional.com.br/material-eletrico/fita'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '104',
+    name: 'sa_bmg',
+    dmu: 'Bearing Man Group',
+    soldTo: 'Bearing Man Group',
+    website: 'https://bmgworld.net',
+    pattern: 'https://bmgworld.net/bmg/en/ZAR/All-Categories/Adhesives/Tape/*',
+    mainCategory: 'https://bmgworld.net/bmg/en/ZAR/All-Categories/Adhesives/Tape/c/E20618',
+    subCategories: [],
+    startUrls: [
+      'https://bmgworld.net/bmg/en/ZAR/All-Categories/Adhesives/Tape/c/E20618'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '105',
+    name: 'sa_fowkes_bros',
+    dmu: 'Fowkes Bros',
+    soldTo: 'Fowkes Bros',
+    website: 'https://www.fowkes.co.za',
+    pattern: 'https://www.fowkes.co.za/product/*',
+    mainCategory: 'https://www.fowkes.co.za/catalogue/adhesive-tapes',
+    subCategories: [],
+    startUrls: [
+      'https://www.fowkes.co.za/catalogue/adhesive-tapes'
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '106',
+    name: 'ro_proxima',
+    dmu: 'Proxima',
+    soldTo: 'Proxima',
+    website: 'http://proximatapes.ro',
+    pattern: 'http://proximatapes.ro/*',
+    mainCategory: 'http://proximatapes.ro/fixare/benzi-dublu-adezive-lipire-permanenta.html',
+    subCategories: [],
+    startUrls: [
+      'http://proximatapes.ro/fixare/benzi-dublu-adezive-lipire-permanenta.html'
+    ],
+    info: 'many main categories, setup?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '107',
+    name: 'au_armpack',
+    dmu: 'Armpack',
+    soldTo: 'Armpack',
+    website: 'https://armpack.com.au',
+    pattern: 'https://armpack.com.au/product/*',
+    mainCategory: 'https://armpack.com.au/product-category/tapes-and-adhesives/',
+    subCategories: [],
+    startUrls: [
+      'https://armpack.com.au/product-category/tapes-and-adhesives/'
+    ],
+    info: 'no prices',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '108',
+    name: 'vn_creative',
+    dmu: 'Creative',
+    soldTo: 'CREATIVE ENGINEERING',
+    website: 'https://www.ce.com.vn/vi/product-tag/tesa/',
+    pattern: 'https://www.ce.com.vn/vi/products/*',
+    mainCategory: 'https://www.ce.com.vn/vi/product-tag/bang-keo-cong-nghiep/',
+    subCategories: [],
+    startUrls: [
+      'https://www.ce.com.vn/vi/product-tag/bang-keo-cong-nghiep/'
+    ],
+    info: 'no prices, need to check language',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '109',
+    name: 'au_emjay',
+    dmu: 'EMJAY PRODUCTS PTY LTD',
+    soldTo: 'EMJAY PRODUCTS PTY L',
+    website: 'https://www.emjayproducts.com.au',
+    pattern: '',
+    mainCategory: 'https://www.emjayproducts.com.au/product-category/eco-friendly-products/packaging-tape-eco-friendly-products/',
+    subCategories: [],
+    startUrls: [
+      'https://www.emjayproducts.com.au/product-category/eco-friendly-products/packaging-tape-eco-friendly-products/'
+    ],
+    info: 'many main categories, setup?',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '110',
+    name: 'br_celmar',
+    dmu: 'Celmar',
+    soldTo: 'Celmar',
+    website: 'https://celmar.com.br',
+    pattern: 'https://celmar.com.br/produtos/mro/*',
+    mainCategory: 'https://celmar.com.br/produtos/?swoof=1&woof_text=fita',
+    subCategories: [],
+    startUrls: [
+      'https://celmar.com.br/produtos/?swoof=1&woof_text=fita'
+    ],
+    info: 'products only available through search query in url, will have some wrong products',
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '111',
+    name: 'au_armstrong_packaging',
+    dmu: 'ARMSTRONG PACKAGING',
+    soldTo: 'ARMSTRONG PACKAGING',
+    website: 'http://www.armpack.com.au',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '112',
+    name: 'it_corazza_carlo',
+    dmu: 'CORAZZA CARLO',
+    soldTo: 'CORAZZA CARLO S.R.L.',
+    website: 'https://shop.corazzacarlo.com',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '113',
+    name: 'pl_eko_tech',
+    dmu: 'EKO-TECH',
+    soldTo: 'EKO-TECH SPÃ"ÅKA Z O.',
+    website: 'https://www.eko-tech.biz',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '114',
+    name: 'de_friedrich_schwertfeger',
+    dmu: 'Friedrich Schwertfeger',
+    soldTo: 'Friedrich Schwertfeg',
+    website: 'https://www.klebfix.eu',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '115',
+    name: 'de_k_k_klebetechnik',
+    dmu: 'K + K Klebetechnik',
+    soldTo: 'K + K Klebetechnik G',
+    website: 'https://www.kk-klebetechnik.de',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '116',
+    name: 'sk_kbm',
+    dmu: 'KBM',
+    soldTo: 'KBM, s.r.o.',
+    website: 'https://eshop.kbm.sk',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '117',
+    name: 'de_logotape',
+    dmu: 'Logotape',
+    soldTo: 'Scharnau City Shop G',
+    website: 'https://scharnau-berlin.de',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '118',
+    name: 'sk_pebal',
+    dmu: 'PEBAL',
+    soldTo: 'PEBAL s.r.o.',
+    website: 'https://epackshop.myshopify.com/',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '119',
+    name: 'se_svensk_industri',
+    dmu: 'SVENSK INDUSTRI KONVERTERING AB',
+    soldTo: 'SVENSK INDUSTRI KONV',
+    website: 'https://shop.sikab.se',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '120',
+    name: 'au_vision_pack',
+    dmu: 'VISION PACK',
+    soldTo: 'VISION PACK PTY LTD',
+    website: 'https://visionpack.com.au',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '121',
+    name: 'au_blackwoods',
+    dmu: 'Blackwoods',
+    soldTo: 'Blackwoods',
+    website: 'https://www.blackwoods.com.au',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '122',
+    name: 'de_transpack_krumbach',
+    dmu: 'Transpack Krümbach',
+    soldTo: 'Transpack Krümbach',
+    website: 'https://www.transpack-krumbach.de',
+    pattern: '',
+    mainCategory: '',
+    subCategories: [],
+    startUrls: [''],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '123',
+    name: 'us_krayden',
+    dmu: 'Krayden',
+    soldTo: 'Krayden',
+    website: 'https://krayden.com',
+    pattern: 'https://krayden.com/categories/tapes/*',
+    mainCategory: 'https://krayden.com/categories/tapes',
+    subCategories: [],
+    startUrls: ['https://krayden.com/categories/tapes'],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '124',
+    name: 'uk_swst',
+    dmu: 'SWST',
+    soldTo: 'SWST',
+    website: 'https://swst.co.uk',
+    pattern: 'https://swst.co.uk/shop/*',
+    mainCategory: 'https://swst.co.uk/shop/',
+    subCategories: [],
+    startUrls: ['https://swst.co.uk/shop/'],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '125',
+    name: 'de_wuerth_eshop',
+    dmu: 'Würth eShop',
+    soldTo: 'Würth eShop',
+    website: 'https://eshop.wuerth.de',
+    pattern: '',
+    mainCategory: 'https://eshop.wuerth.de/de/DE/EUR/',
+    subCategories: [],
+    startUrls: ['https://eshop.wuerth.de/de/DE/EUR/'],
+    maxDepth: 0,
+    maxVisits: 10,
+  },
+  {
+    ranking: '126',
+    name: 'de_hahn_kolb',
+    dmu: 'Würth',
+    soldTo: 'HAHN + KOLB Werkzeug',
+    pattern: 'https://www.hahn-kolb.de/*',
+    startUrls: [
+      // Main category
+      'https://www.hahn-kolb.de/All-categories/Adhesive-tapes-insulating-tapes/1521AC04_1907362.cyid/1521.cgid/en/US/EUR/',
+    ],
+    maxDepth: 0,
+    maxVisits: 10,
   },
 ];
+
+const workingShops = SCRAPING_TARGETS
+  .filter((shop) => shop.working)
+  .map(shop => shop.name);
+
+const sleep = (msec) => new Promise(ok => setTimeout(ok, msec));
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -888,7 +2157,7 @@ async function run_case(targetData) {
     isTape: 'boolean, true or false, is this current page about a roll of tape. give true for rolls of tape, give false for tape dispensers, tape accessories, otoher products that are not rolls of tape',
 
     // Basic info
-    name: 'Product name. For this and all other fields, give answers in ENGLISH, translate if necessary',
+    productName: 'Product name. For this and all other fields, give answers in ENGLISH, translate if necessary',
     brand: 'Brand of the product, eg. tesa, 3m, etc.',
     domain: 'The domain (host) of this website, based on the URL. Format must be https://www.example.com',
     country: 'The two letter country code of this website, based on the URL, lower case',
@@ -1229,11 +2498,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const targetName = process.argv[2];
   
   if (targetName == 'working') {
+    console.log('Running on shops with working=true', workingShops);
+    await sleep(2000);
+
     const jobs = workingShops.map(it => scrapeTarget(it));
-
     const results = await Promise.all(jobs);
-
-    console.log('results', results);
 
     console.log(`Finished scraping all working shops ${workingShops.join(',')}`);
     for (const { outputPath, name, result } of results) {
