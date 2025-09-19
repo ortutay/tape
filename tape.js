@@ -88,17 +88,16 @@ const SCRAPING_TARGETS = [
     dmu: 'Carl Bernh. Hoffmann GmbH & Co. KG',
     soldTo: 'Carl Bernh. Hoffmann',
 
-    // customer: 'Carl Bernh. Hoffmann GmbH & Co. KG',
-    pattern: 'https://www.hoffmann-verpackung.de/**c=**',
+    pattern: 'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband/*',
     startUrls: [
-      'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband/?p=1&o=2&n=100',
-	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck/?p=1&o=2&n=100',
-	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/warndruck-klebeband/?p=1&o=2&n=48',
-	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/nassklebeband/?p=1&o=2&n=48',
-	    'https://www.hoffmann-verpackung.de/klebeband-umreifung/kreppband/?p=1&o=2&n=48',
+      'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband?n=100&o=2&p={{1..5}}',
+      'https://www.hoffmann-verpackung.de/klebeband-umreifung/klebeband-mit-druck?n=100&o=2&p={{1..5}}',
+      'https://www.hoffmann-verpackung.de/klebeband-umreifung/warndruck-klebeband?n=48&o=2&p={{1..5}}',
+      'https://www.hoffmann-verpackung.de/klebeband-umreifung/nassklebeband?n=48&o=2&p={{1..5}}',
+      'https://www.hoffmann-verpackung.de/klebeband-umreifung/kreppband?n=48&o=2&p={{1..5}}',
 	  ],
     maxDepth: 0,
-    maxVisits: 10,
+    maxVisits: 50,
   },
 
   {
