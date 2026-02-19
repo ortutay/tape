@@ -3,8 +3,8 @@ import * as fox from 'fetchfox-sdk';
 const api_key = process.env.FETCHFOX_API_KEY;
 fox.configure({
   apiKey: api_key,
-  host: 'https://staging.api.fetchfox.ai',
-  // host: 'https://api.fetchfox.ai',
+  // host: 'https://staging.api.fetchfox.ai',
+  host: 'https://api.fetchfox.ai',
 });
 
 const runAgent = async () => {
@@ -53,8 +53,8 @@ const demonstrateBost = async () => {
     nonce,
   });
 
-  console.log('out1 item count:', out1.results?.items?.length);
-  console.log('out1 first:', out1.results?.items?.[0]);
+  console.log('out1 item count:', out1.results.items.length);
+  console.log('out1 first:', out1.results.items[0]);
   console.log('out1 cost:', out1.metrics.cost);
 
   const out2 = await fox.extract({
@@ -63,8 +63,8 @@ const demonstrateBost = async () => {
     nonce,
   });
 
-  console.log('out2 item count:', out2.results?.items?.length);
-  console.log('out2 first:', out2.results?.items?.[0]);
+  console.log('out2 item count:', out2.results.items.length);
+  console.log('out2 first:', out2.results.items[0]);
   console.log('out2 cost:', out2.metrics.cost);
 }
 
