@@ -47,6 +47,8 @@ const demonstrateBost = async () => {
     'https://www.hoffmann-group.com/DE/de/hom/p/083772-18X50',
   ];
 
+  console.log('Running:', first, template);
+
   const out1 = await fox.extract({
     urls: first,
     template,
@@ -56,6 +58,10 @@ const demonstrateBost = async () => {
   console.log('out1 item count:', out1.results.items.length);
   console.log('out1 first:', out1.results.items[0]);
   console.log('out1 cost:', out1.metrics.cost);
+
+  console.log('-'.repeat(40));
+
+  console.log('Running:', rest, template);
 
   const out2 = await fox.extract({
     urls: rest,
@@ -69,7 +75,7 @@ const demonstrateBost = async () => {
 }
 
 const main = async () => {
-  // await runAgent();
+  await runAgent();
   await demonstrateBost();
   process.exit(0);
 } 
