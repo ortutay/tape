@@ -3,9 +3,8 @@ import * as fox from 'fetchfox-sdk';
 const api_key = process.env.FETCHFOX_API_KEY;
 fox.configure({
   apiKey: api_key,
-  // host: 'https://staging.api.fetchfox.ai',
+  host: 'https://staging.api.fetchfox.ai',
   // host: 'https://api.fetchfox.ai',
-  host: 'http://localhost:3030',
 });
 
 const run = async () => {
