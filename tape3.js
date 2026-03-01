@@ -9,6 +9,8 @@ fox.configure({
 
 const run = async () => {
   const maxVisits = 10;
+  const maxExtracts = 50;
+
   const top = 'https://shop.eriks.nl/en/maintenance-products/maintenance-products-tapes-and-accessories/maintenance-products-tapes-and-accessories-tapes/';
 
   const steps = [
@@ -43,6 +45,17 @@ const run = async () => {
 
   console.log('All product URLs:', allProductUrls);
   console.log(allProductUrls.length);
+
+  const out = await fox.extract({
+    urls: allProductUrls.slice(0, maxExtracts),
+    template: {
+      name: 'product name',
+      price: 'product price in EUR',
+      dimensions: '{ width: width in mm, length: length in m }, numbers only'
+    }
+  });
+  console.log(out);
+  console.log('Items:', out.results.items);
 }
 
 run();
