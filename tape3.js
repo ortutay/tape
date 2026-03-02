@@ -4,7 +4,6 @@ const api_key = process.env.FETCHFOX_API_KEY;
 fox.configure({
   apiKey: api_key,
   host: 'https://staging.api.fetchfox.ai',
-  // host: 'http://localhost:3030',
 });
 
 const run = async () => {
@@ -55,20 +54,12 @@ const run = async () => {
 
   const out = await fox.extract({
     urls: allProductUrls.slice(0, maxExtracts),
-    // urls: [
-    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/adhesive-tape-af080-aluminium-without-film-100mmx50m-12740576/',
-    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/adhesive-tape-af080-aluminium-without-film-30mmx50m-12740574/',
-    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/adhesive-tape-af080-aluminium-without-film-50mmx50m-12740575/',
-    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/aluminium-foil-tape-1436-silver-100-mm-x-50-m-23168677/',
-    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/aluminium-tape-w-o-film-50m-x-25mm-12971038/',
-    // ],
     template: {
       name: 'product name',
       price: 'product price in EUR',
       dimensions: '{ width: width in mm, length: length in m }, numbers only'
     }
   });
-  console.log(out);
   console.log('Items:', out.results.items);
   console.log('Items length:', out.results.items.length);
 }
