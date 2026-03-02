@@ -8,7 +8,7 @@ fox.configure({
 });
 
 const run = async () => {
-  const maxVisits = 10;
+  const maxVisits = 300;
   const maxExtracts = 50;
 
   const top = 'https://shop.eriks.nl/en/maintenance-products/maintenance-products-tapes-and-accessories/maintenance-products-tapes-and-accessories-tapes/';
@@ -21,17 +21,24 @@ const run = async () => {
 
   let urls = [top];
   const hits = [];
+  const batchSize = 20;
   for (const step of steps) {
-    const out = await fox.crawl({
-      query: step,
-      startUrls: urls,
-      maxVisits,
-      maxDepth: 0,
-    });
-    urls = out.results.hits;
-    console.log('Step:', step);
-    console.log('Hits:', urls);
-    hits.push(urls);
+    const stepHits = [];
+    for (let i = 0; i < urls.length; i += batchSize) {
+      console.log('Running', i, step);
+      const out = await fox.crawl({
+        query: step,
+        startUrls: urls.slice(i, i + batchSize),
+        maxVisits,
+        maxDepth: 0,
+      });
+      stepHits.push(...out.results.hits);
+      console.log('Batch got:', out.results.hits.length, 'now at', stepHits.length);
+    }
+    console.log('Hits:', stepHits);
+    console.log('Hits length:', stepHits.length);
+    hits.push(stepHits);
+    urls = stepHits;
   }
 
   const productUrls = hits[1];
@@ -44,10 +51,17 @@ const run = async () => {
   const allProductUrls = [...(new Set([...productUrls, ...variantUrls]))].sort();
 
   console.log('All product URLs:', allProductUrls);
-  console.log(allProductUrls.length);
+  console.log('Number of product urls found:', allProductUrls.length);
 
   const out = await fox.extract({
     urls: allProductUrls.slice(0, maxExtracts),
+    // urls: [
+    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/adhesive-tape-af080-aluminium-without-film-100mmx50m-12740576/',
+    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/adhesive-tape-af080-aluminium-without-film-30mmx50m-12740574/',
+    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/adhesive-tape-af080-aluminium-without-film-50mmx50m-12740575/',
+    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/aluminium-foil-tape-1436-silver-100-mm-x-50-m-23168677/',
+    //   'https://shop.eriks.nl/en/maintenance-products-tapes-and-accessories-tapes-aluminium-tape/aluminium-tape-w-o-film-50m-x-25mm-12971038/',
+    // ],
     template: {
       name: 'product name',
       price: 'product price in EUR',
@@ -56,6 +70,7 @@ const run = async () => {
   });
   console.log(out);
   console.log('Items:', out.results.items);
+  console.log('Items length:', out.results.items.length);
 }
 
 run();
