@@ -1,12 +1,17 @@
 import * as fox from 'fetchfox-sdk';
 import { writeFile } from 'fs/promises';
 
-
 const api_key = process.env.FETCHFOX_API_KEY;
 fox.configure({
   apiKey: api_key,
   host: 'https://api.fetchfox.ai',
+  // host: 'https://staging.api.fetchfox.ai',
 });
+
+const nonce = 2; // change this to drop previous cached values
+const attempts = 5; // retry errors/blocks up to 5 times
+const loadWait = 5000; // wait an extra 5 seconds to ensure page load
+const proxy = 'auto';
 
 const scrapeEriksNl = async (top, template, maxVisits, maxExtracts) => {
   const steps = [
@@ -28,6 +33,10 @@ const scrapeEriksNl = async (top, template, maxVisits, maxExtracts) => {
         startUrls,
         maxVisits,
         maxDepth: 0,
+        loadWait,
+        attempts,
+        nonce,
+        proxy,
       });
       console.log('Batch results:', {
         startUrls,
@@ -53,7 +62,11 @@ const scrapeEriksNl = async (top, template, maxVisits, maxExtracts) => {
     console.log('Run extract', i);
     const out = await fox.extract({
       urls: allProductUrls.slice(i, i + batchSize),
-      template
+      template,
+      loadWait,
+      attempts,
+      nonce,
+      proxy,
     });
     console.log('Batch items:', out.results.items);
     console.log('Batch items length:', out.results.items.length);
