@@ -4,13 +4,13 @@ import { writeFile } from 'fs/promises';
 const api_key = process.env.FETCHFOX_API_KEY;
 fox.configure({
   apiKey: api_key,
-  host: 'https://api.fetchfox.ai',
-  // host: 'https://staging.api.fetchfox.ai',
+  // host: 'https://api.fetchfox.ai',
+  host: 'https://staging.api.fetchfox.ai',
 });
 
 const nonce = 2; // change this to drop previous cached values
 const attempts = 5; // retry errors/blocks up to 5 times
-const loadWait = 5000; // wait an extra 5 seconds to ensure page load
+const loadWait = 0; // extra wait to ensure page load
 const proxy = 'auto';
 
 const scrapeEriksNl = async (top, template, maxVisits, maxExtracts) => {
@@ -76,8 +76,8 @@ const scrapeEriksNl = async (top, template, maxVisits, maxExtracts) => {
 }
 
 const run = async () => {
-  const maxVisits = 300;
-  const maxExtracts = 1000;
+  const maxVisits = 10;
+  const maxExtracts = 10;
   const startingUrl = 'https://shop.eriks.nl/en/maintenance-products/maintenance-products-tapes-and-accessories/maintenance-products-tapes-and-accessories-tapes/';
   const template = {
     name: 'product name',

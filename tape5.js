@@ -5,7 +5,7 @@ import { writeFile } from 'fs/promises';
 const api_key = process.env.FETCHFOX_API_KEY;
 fox.configure({
   apiKey: api_key,
-  host: 'https://api.fetchfox.ai',
+  host: 'https://staging.api.fetchfox.ai',
 });
 
 const scrapeRsOnline = async (top, template, maxVisits, maxExtracts) => {
@@ -51,10 +51,14 @@ const scrapeRsOnline = async (top, template, maxVisits, maxExtracts) => {
     console.log('Run extract', i);
     const out = await fox.extract({
       urls: allProductUrls.slice(i, i + batchSize),
-      template
+      template,
+      nonce: 1
     });
     console.log('Batch items:', out.results.items);
-    console.log('Batch items length:', out.results.items.length);
+    const len = out.results.items.length
+    const boostedLen = out.results.items.filter(it => it._boosted).length
+    console.log(`Batch items length is ${len}, with ${boostedLen} boosted`);
+    console.log(`Total cost was ${out.metrics.cost.total}, and AI cost was ${out.metrics.cost.ai}`);
     items.push(...out.results.items);
   }
 
