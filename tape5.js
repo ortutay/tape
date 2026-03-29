@@ -9,48 +9,24 @@ fox.configure({
 });
 
 const scrapeRsOnline = async (top, template, maxVisits, maxExtracts) => {
-  const steps = [
-    'Find the tape category URLs',
-    'Find product detail URLs',
-  ];
+  const out = await fox.crawl({
+    steps: [
+      'Find the tape category URLs',
+      'Find product detail URLs',
+    ],
+    startUrls: [top],
+    maxVisits: 500,
+  });
 
-  let urls = [top];
-  const hits = [];
-  const batchSize = 20;
-  for (const step of steps) {
-    const stepHits = [];
-    for (let i = 0; i < urls.length && i < maxVisits; i += batchSize) {
-      console.log('Running', i, step);
-      const startUrls = urls.slice(i, i + batchSize);
-      const out = await fox.crawl({
-        query: step,
-        startUrls,
-        maxVisits,
-        maxDepth: 0,
-      });
-      console.log('Batch results:', {
-        startUrls,
-        hits: out.results.hits,
-        len: out.results.hits.length,
-      });
-      stepHits.push(...out.results.hits);
-    }
-    console.log('Hits:', stepHits);
-    console.log('Hits length:', stepHits.length);
-    hits.push(stepHits);
-    urls = stepHits.slice(0, maxVisits);
-  }
-
-  const productUrls = hits[1];
-  const allProductUrls = [...(new Set(productUrls))].sort();
-  console.log('All product URLs:', allProductUrls);
-  console.log('Final number of product urls found:', allProductUrls.length);
+  const hits = out.results.hits;
+  console.log('Hits:', hits);
+  console.log('Final number of product urls found:', hits.length);
 
   const items = [];
-  for (let i = 0; i < allProductUrls.length && i < maxExtracts; i += batchSize) {
+  for (let i = 0; i < hits.length && i < maxExtracts; i += batchSize) {
     console.log('Run extract', i);
     const out = await fox.extract({
-      urls: allProductUrls.slice(i, i + batchSize),
+      urls: hits.slice(i, i + batchSize),
       template,
       nonce: 1
     });
@@ -80,6 +56,8 @@ const run = async () => {
     template,
     maxVisits,
     maxExtracts);
+
+  return;
 
   console.log('Final result:', items);
   console.log('Final result count:', items.length);
